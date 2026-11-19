@@ -1,0 +1,6 @@
+{
+  "name": "Lumière Atelier — Luxury Photography & Cinematography Booking Platform",
+  "description": "Editorial photography and cinema production studio with interactive multi-step shoot booking, real-time availability validation, Razorpay advance payments, and studio admin suite.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

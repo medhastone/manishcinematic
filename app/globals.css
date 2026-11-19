@@ -1,0 +1,187 @@
+@import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *));
+
+@layer base {
+  :root {
+    --mc-black: #0a0a0a;
+    --mc-surface: #121212;
+    --mc-red: #e10600;
+    --mc-red-glow: rgba(225, 6, 0, 0.35);
+    --mc-white: #ffffff;
+    --mc-muted: #a3a3a3;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    background-color: #0a0a0a;
+    color: #ffffff;
+  }
+
+  body {
+    font-family: var(--font-poppins), system-ui, -apple-system, sans-serif;
+    background-color: #0a0a0a;
+    color: #ffffff;
+    overflow-x: hidden;
+  }
+
+  .font-display {
+    font-family: var(--font-display), system-ui, sans-serif;
+  }
+
+  .font-script {
+    font-family: var(--font-script), cursive;
+  }
+
+  .tabular-nums {
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+/* Cinematic Film-Strip Sprocket Holes Pattern */
+.film-strip-band {
+  background-image: repeating-linear-gradient(
+    to right,
+    #141414 0px,
+    #141414 14px,
+    transparent 14px,
+    transparent 26px
+  );
+}
+
+/* Red WhatsApp Pulse Ring */
+@keyframes mc-pulse-ring {
+  0% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.65);
+  }
+  70% {
+    transform: scale(1);
+    box-shadow: 0 0 0 18px rgba(37, 211, 102, 0);
+  }
+  100% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(37, 211, 102, 0);
+  }
+}
+
+.whatsapp-pulse {
+  animation: mc-pulse-ring 2.2s infinite;
+}
+
+/* Glowing Red Border for Highlighted Starting Package */
+@keyframes mc-red-border-glow {
+  0%, 100% {
+    box-shadow: 0 0 24px rgba(225, 6, 0, 0.32), inset 0 0 16px rgba(225, 6, 0, 0.08);
+  }
+  50% {
+    box-shadow: 0 0 42px rgba(225, 6, 0, 0.58), inset 0 0 22px rgba(225, 6, 0, 0.16);
+  }
+}
+
+.package-red-glow {
+  animation: mc-red-border-glow 3s ease-in-out infinite;
+}
+
+/* Subtle 3D Tilt & Red Glow on Service Cards */
+.service-tilt-card {
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+    border-color 0.25s ease,
+    box-shadow 0.25s ease;
+  will-change: transform;
+}
+
+.service-tilt-card:hover {
+  transform: perspective(900px) rotateX(2.5deg) rotateY(-2.5deg) translateY(-4px);
+  border-color: rgba(225, 6, 0, 0.75);
+  box-shadow: 0 18px 40px -12px rgba(225, 6, 0, 0.28);
+}
+
+/* Precision Cinema Equipment Frame with Animated Crimson Bevel Outline */
+@keyframes mc-outline-breathe {
+  0%, 100% {
+    box-shadow: 0 0 0 1px rgba(225, 6, 0, 0.35), 0 18px 44px -16px rgba(0, 0, 0, 0.85),
+      0 0 26px -6px rgba(225, 6, 0, 0.22);
+  }
+  50% {
+    box-shadow: 0 0 0 1px rgba(225, 6, 0, 0.72), 0 22px 52px -14px rgba(0, 0, 0, 0.9),
+      0 0 38px -4px rgba(225, 6, 0, 0.42);
+  }
+}
+
+.cinema-gear-frame {
+  position: relative;
+  border-radius: 1.25rem;
+  padding: 1.5px;
+  background: linear-gradient(
+    135deg,
+    rgba(225, 6, 0, 0.85) 0%,
+    rgba(255, 255, 255, 0.16) 45%,
+    rgba(255, 255, 255, 0.06) 65%,
+    rgba(225, 6, 0, 0.65) 100%
+  );
+  animation: mc-outline-breathe 4.2s ease-in-out infinite;
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+    filter 0.35s ease;
+}
+
+.cinema-gear-frame:hover {
+  transform: translateY(-5px) scale(1.015);
+  filter: drop-shadow(0 0 20px rgba(225, 6, 0, 0.35));
+}
+
+.cinema-gear-inner {
+  position: relative;
+  border-radius: calc(1.25rem - 1.5px);
+  overflow: hidden;
+  background: #0b0b0b;
+}
+
+.cinema-gear-inner::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    120deg,
+    transparent 30%,
+    rgba(255, 255, 255, 0.12) 48%,
+    transparent 65%
+  );
+  transform: translateX(-125%);
+  transition: transform 0.85s cubic-bezier(0.16, 1, 0.3, 1);
+  pointer-events: none;
+}
+
+.cinema-gear-frame:hover .cinema-gear-inner::after {
+  transform: translateX(125%);
+}
+
+/* Precision Viewfinder L-Brackets */
+.vf-corner {
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  border-color: #e10600;
+  pointer-events: none;
+  z-index: 20;
+  transition: width 0.25s ease, height 0.25s ease, opacity 0.25s ease;
+  opacity: 0.9;
+}
+
+.cinema-gear-frame:hover .vf-corner {
+  width: 20px;
+  height: 20px;
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  .service-tilt-card:hover,
+  .cinema-gear-frame:hover {
+    transform: none;
+  }
+}
