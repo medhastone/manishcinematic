@@ -1,7 +1,9 @@
 import { MetadataRoute } from 'next';
 
+export const dynamic = 'force-static';
+
 export default function robots(): MetadataRoute.Robots {
-  const baseUrl = process.env.APP_URL || 'https://lumiereatelier.in';
+  const baseUrl = process.env.APP_URL || 'https://manishcinematic.in';
   return {
     rules: {
       userAgent: '*',

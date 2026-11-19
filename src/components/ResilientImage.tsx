@@ -10,10 +10,21 @@ interface ResilientImageProps {
   fallbackTitle?: string;
 }
 
+const BASE_PATH = (process.env.NEXT_PUBLIC_BASE_PATH || '').replace(/\/+$/, '');
+
+function resolveAssetSrc(src: string): string {
+  if (!src || !BASE_PATH) return src;
+  if (src.startsWith('/') && !src.startsWith('//') && !src.startsWith(`${BASE_PATH}/`)) {
+    return `${BASE_PATH}${src}`;
+  }
+  return src;
+}
+
 export function ResilientImage({ src, alt, className = '', fallbackTitle }: ResilientImageProps) {
   const [hasError, setHasError] = useState(false);
+  const resolvedSrc = resolveAssetSrc(src);
 
-  if (hasError || !src) {
+  if (hasError || !resolvedSrc) {
     return (
       <div
         className={`flex flex-col items-center justify-center bg-gradient-to-br from-[#121212] via-[#0e0e0e] to-[#0a0a0a] text-neutral-300 p-6 text-center ${className}`}
@@ -28,7 +39,7 @@ export function ResilientImage({ src, alt, className = '', fallbackTitle }: Resi
 
   return (
     <img
-      src={src}
+      src={resolvedSrc}
       alt={alt}
       referrerPolicy="no-referrer"
       onError={() => setHasError(true)}

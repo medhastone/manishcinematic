@@ -456,19 +456,38 @@ export default function ManishCinematicPage() {
   }, []);
 
   const fetchMapConfig = useCallback(async () => {
+    const fallbackEmbedUrl =
+      'https://maps.google.com/maps?q=25.5035447,85.9278056&t=&z=16&ie=UTF8&iwloc=&output=embed';
     try {
       const res = await fetch('/api/maps-embed');
-      if (res.ok) {
+      const contentType = res.headers.get('content-type') || '';
+      if (res.ok && contentType.includes('application/json')) {
         const data = await res.json();
-        if (data.embedUrl) setMapEmbedUrl(data.embedUrl);
+        setMapEmbedUrl(data.embedUrl || fallbackEmbedUrl);
+        return;
       }
-    } catch (err) {
-      console.error('Failed to load Maps Embed URL:', err);
+    } catch {
+      // Static GitHub Pages hosting fallback
     }
+    setMapEmbedUrl(fallbackEmbedUrl);
   }, []);
 
   useEffect(() => {
     const id = window.setTimeout(() => {
+      try {
+        const localRaw = window.localStorage.getItem('mc_local_reviews');
+        if (localRaw) {
+          const parsed = JSON.parse(localRaw) as StudioTestimonial[];
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            setDbTestimonials((prev) => {
+              const seen = new Set(prev.map((item) => item.id));
+              return [...parsed.filter((item) => !seen.has(item.id)), ...prev];
+            });
+          }
+        }
+      } catch {
+        // Ignore storage errors
+      }
       void fetchCatalog();
       void fetchMapConfig();
     }, 0);

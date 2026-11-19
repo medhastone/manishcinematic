@@ -202,25 +202,81 @@ export function QuickBookingForm({
 
     setSubmitting(true);
     try {
-      const token = await getFreshToken();
+      const token = await getFreshToken().catch(() => null);
       const matchedService =
         SERVICE_OPTIONS.find((s) => s.label === serviceLabel) || SERVICE_OPTIONS[0];
       const fallbackPkg = packages[0];
 
-      const res = await fetch('/api/bookings', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          ...(token ? { Authorization: `Bearer ${token}` } : {}),
-        },
-        body: JSON.stringify({
+      let createdBooking: StudioBooking | null = null;
+      let finalEmailStatus: EmailStatusState = {
+        sent: false,
+        recipient: STUDIO_EMAIL,
+        message: 'Dispatching email notification...',
+      };
+      let shouldFallbackToStatic = false;
+
+      try {
+        const res = await fetch('/api/bookings', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            ...(token ? { Authorization: `Bearer ${token}` } : {}),
+          },
+          body: JSON.stringify({
+            customerName: name.trim(),
+            customerEmail: email.trim() || `${phone.replace(/\D/g, '')}@manishcinematic.in`,
+            customerPhone: phone.trim(),
+            serviceSlug: matchedService.slug,
+            packageId: fallbackPkg?.id || 1,
+            selectedAddons: [],
+            eventFunctions: [serviceLabel],
+            eventName: `${name.trim()} — ${serviceLabel}`,
+            eventVenue: venue.trim() || 'Begusarai Venue',
+            city: city.trim() || 'Begusarai, Bihar',
+            eventDate,
+            eventEndDate: eventDate,
+            eventStartTime: '10:00 AM',
+            eventDurationHours: 8,
+            specialInstructions: notes.trim(),
+          }),
+        });
+
+        const contentType = res.headers.get('content-type') || '';
+        if (res.status === 404 || res.status === 405 || !contentType.includes('application/json')) {
+          shouldFallbackToStatic = true;
+        } else {
+          const data = await res.json();
+          if (!res.ok) {
+            throw new Error(data.error || 'Could not save booking inquiry.');
+          }
+          createdBooking = data.booking;
+          if (data.emailNotification) {
+            finalEmailStatus = data.emailNotification;
+          }
+        }
+      } catch (fetchErr) {
+        if (fetchErr instanceof TypeError) {
+          shouldFallbackToStatic = true;
+        } else {
+          throw fetchErr;
+        }
+      }
+
+      if (shouldFallbackToStatic || !createdBooking) {
+        const bookingCode = `MC-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`;
+        createdBooking = {
+          id: Date.now(),
+          bookingCode,
+          userUid: firebaseUser?.uid || `guest-${Date.now()}`,
           customerName: name.trim(),
           customerEmail: email.trim() || `${phone.replace(/\D/g, '')}@manishcinematic.in`,
           customerPhone: phone.trim(),
           serviceSlug: matchedService.slug,
+          serviceName: serviceLabel,
           packageId: fallbackPkg?.id || 1,
-          selectedAddons: [],
-          eventFunctions: [serviceLabel],
+          packageName: fallbackPkg?.name || 'Starting Package ₹15,000/-',
+          selectedAddons: '[]',
+          eventFunctions: JSON.stringify([serviceLabel]),
           eventName: `${name.trim()} — ${serviceLabel}`,
           eventVenue: venue.trim() || 'Begusarai Venue',
           city: city.trim() || 'Begusarai, Bihar',
@@ -229,22 +285,24 @@ export function QuickBookingForm({
           eventStartTime: '10:00 AM',
           eventDurationHours: 8,
           specialInstructions: notes.trim(),
-        }),
-      });
-
-      const data = await res.json();
-      if (!res.ok) {
-        throw new Error(data.error || 'Could not save booking inquiry.');
+          basePrice: fallbackPkg?.price || 15000,
+          addonsTotal: 0,
+          discountAmount: 0,
+          taxAmount: 0,
+          totalAmount: fallbackPkg?.price || 15000,
+          advanceAmount: 4500,
+          paidAmount: 0,
+          remainingBalance: fallbackPkg?.price || 15000,
+          paymentStatus: 'pending',
+          bookingStatus: 'inquiry_saved',
+          assignedPhotographer: 'Manish Cinematic Crew',
+          assignedVideographer: 'Manish Cinematic Crew',
+          internalNotes: '',
+          rescheduleRequestedDate: '',
+          cancellationReason: '',
+          createdAt: new Date().toISOString(),
+        };
       }
-
-      const createdBooking: StudioBooking = data.booking;
-
-      // Use server-side free email notification result; if server origin was blocked, run browser FormSubmit fallback
-      let finalEmailStatus: EmailStatusState = data.emailNotification || {
-        sent: false,
-        recipient: STUDIO_EMAIL,
-        message: 'Dispatching email notification...',
-      };
 
       if (!finalEmailStatus.sent) {
         finalEmailStatus = await sendBrowserFormSubmitFallback(createdBooking);
