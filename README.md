@@ -11,7 +11,8 @@ This repository includes a pre-configured GitHub Actions workflow (`.github/work
 1. Push this project to your GitHub repository (`main` or `master` branch).
 2. Open your repository on GitHub and go to **Settings → Pages**.
 3. Under **Build and deployment → Source**, select **GitHub Actions**.
-4. Push any commit (or go to **Actions → Deploy Manish Cinematic to GitHub Pages → Run workflow**) — your live site will publish automatically.
+4. Under **Custom domain**, ensure `manishcinematic.in` is saved (matching `public/CNAME` so assets load from `/`).
+5. Push any commit (or go to **Actions → Deploy Manish Cinematic to GitHub Pages → Run workflow**) — your live site will publish automatically.
 
 ### Full-Stack Mode (Optional)
 

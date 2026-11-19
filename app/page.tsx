@@ -973,8 +973,8 @@ export default function ManishCinematicPage() {
                   </div>
 
                   <h1 className="font-display font-black italic uppercase tracking-tight leading-[0.98] text-4xl sm:text-6xl lg:text-7xl text-white">
-                    <span className="mc-hero-line block">Capture</span>
-                    <span className="mc-hero-line block">Your Best</span>
+                    <span className="mc-hero-line block">Capture </span>
+                    <span className="mc-hero-line block">Your Best </span>
                     <span className="mc-hero-line block text-[#e10600]">Moment</span>
                   </h1>
 

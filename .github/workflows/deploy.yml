@@ -45,15 +45,18 @@ jobs:
       - name: Configure GitHub Pages
         id: pages
         uses: actions/configure-pages@v5
-        with:
-          static_site_generator: next
 
       - name: Build static export for GitHub Pages
         env:
           GITHUB_PAGES: "true"
-          NEXT_PUBLIC_BASE_PATH: ${{ steps.pages.outputs.base_path }}
         run: |
           set -e
+          if [ -f "public/CNAME" ]; then
+            export NEXT_PUBLIC_BASE_PATH=""
+          else
+            export NEXT_PUBLIC_BASE_PATH="${{ steps.pages.outputs.base_path }}"
+          fi
+
           API_BACKUP_DIR=""
           if [ -d "app/api" ]; then
             API_BACKUP_DIR=$(mktemp -d)
