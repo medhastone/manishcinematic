@@ -10,6 +10,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
       lastModified: new Date(),
       changeFrequency: 'weekly',
       priority: 1.0,
+      images: [
+        `${baseUrl}/assets/cinema_hero_backdrop_1795170914610.jpg`,
+        `${baseUrl}/assets/aistudio/2026-11-19_14.43.52_c4eb0004.jpg`,
+        `${baseUrl}/assets/aistudio/2026-11-19_13.45.16_856a87fb.jpg`,
+        `${baseUrl}/assets/aistudio/2026-11-19_13.44.44_328bb63e.jpg`,
+        `${baseUrl}/assets/aistudio/2026-11-19_14.57.32_3f4f843c.jpg`,
+      ],
     },
   ];
 }

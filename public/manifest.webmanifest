@@ -1,11 +1,11 @@
 {
-  "name": "Manish Cinematic — Wedding Photography & Films",
+  "name": "Manish Cinematic – Wedding Shoot & Reel Maker in Bihar",
   "short_name": "Manish Cinematic",
-  "description": "Dream • Shoot • Create. Wedding photography, pre-wedding shoots, 4K cinematic wedding films, drone coverage & short films in Begusarai, Bihar.",
+  "description": "Wedding photography, pre-wedding shoots, 4K cinematic wedding films, drone coverage & Instagram reel making for families, shops & coaching centres in Begusarai & across Bihar.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#0a0a0a",
-  "theme_color": "#e10600",
+  "background_color": "#3E0815",
+  "theme_color": "#3E0815",
   "icons": [
     {
       "src": "/favicon-48x48.png",

@@ -2019,7 +2019,23 @@ export default function ManishCinematicPage() {
           </div>
         </div>
 
-        <div className="max-w-7xl mx-auto px-5 sm:px-8 lg:px-12 mt-10 pt-6 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4">
+        {/* Local SEO Coverage Strip — Bihar Districts & Shoot Services */}
+        <div className="max-w-7xl mx-auto px-5 sm:px-8 lg:px-12 mt-10 pt-6 border-t border-[#D4AF37]/20 space-y-2.5 text-[11px] text-neutral-300/85">
+          <p className="leading-relaxed">
+            <span className="font-semibold text-[#F3D27A] uppercase tracking-wider mr-2">
+              Serving Across Bihar:
+            </span>
+            Teghra · Begusarai · Barauni · Bihat · Bachhwara · Bakhri · Samastipur · Khagaria · Lakhisarai · Mokama · Munger · Patna · Darbhanga · Muzaffarpur · Hajipur · Bhagalpur · Nalanda · Gaya · Purnia
+          </p>
+          <p className="leading-relaxed">
+            <span className="font-semibold text-[#F3D27A] uppercase tracking-wider mr-2">
+              Popular Shoots:
+            </span>
+            Wedding Photography &amp; 4K Cinema Films · Shaadi Reels (24–48 Hr) · Pre-Wedding Shoot in Bihar · Coaching Centre &amp; Dukaan Promotional Reels · 4K Aerial Drone Coverage · Engagement, Birthday &amp; Chhath Puja Reels · Short Films
+          </p>
+        </div>
+
+        <div className="max-w-7xl mx-auto px-5 sm:px-8 lg:px-12 mt-6 pt-6 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4">
           <p className="text-neutral-300 font-medium">© Manish Cinematic. All Rights Reserved.</p>
           <a
             href={SOCIAL_LINKS.googleMaps}
