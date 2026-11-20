@@ -49,6 +49,8 @@ jobs:
       - name: Build static export for GitHub Pages
         env:
           GITHUB_PAGES: "true"
+          APP_URL: "https://manishcinematic.in"
+          NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION: ${{ vars.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION }}
         run: |
           set -e
           if [ -f "public/CNAME" ]; then

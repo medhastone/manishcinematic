@@ -8,6 +8,7 @@ interface ResilientImageProps {
   alt: string;
   className?: string;
   fallbackTitle?: string;
+  loading?: 'lazy' | 'eager';
 }
 
 const BASE_PATH = (process.env.NEXT_PUBLIC_BASE_PATH || '').replace(/\/+$/, '');
@@ -20,14 +21,20 @@ function resolveAssetSrc(src: string): string {
   return src;
 }
 
-export function ResilientImage({ src, alt, className = '', fallbackTitle }: ResilientImageProps) {
+export function ResilientImage({
+  src,
+  alt,
+  className = '',
+  fallbackTitle,
+  loading = 'lazy',
+}: ResilientImageProps) {
   const [hasError, setHasError] = useState(false);
   const resolvedSrc = resolveAssetSrc(src);
 
   if (hasError || !resolvedSrc) {
     return (
       <div
-        className={`flex flex-col items-center justify-center bg-gradient-to-br from-[#121212] via-[#0e0e0e] to-[#0a0a0a] text-neutral-300 p-6 text-center ${className}`}
+        className={`flex flex-col items-center justify-center bg-gradient-to-br from-[#4E0B1B] via-[#3E0815] to-[#2B060F] text-neutral-200 p-6 text-center ${className}`}
       >
         <Camera className="w-8 h-8 text-[#e10600] mb-2 stroke-[1.5]" />
         <span className="font-display italic text-sm tracking-wide text-white">
@@ -41,6 +48,8 @@ export function ResilientImage({ src, alt, className = '', fallbackTitle }: Resi
     <img
       src={resolvedSrc}
       alt={alt}
+      loading={loading}
+      decoding="async"
       referrerPolicy="no-referrer"
       onError={() => setHasError(true)}
       className={className}

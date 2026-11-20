@@ -3,23 +3,23 @@
 
 @layer base {
   :root {
-    --mc-black: #0a0a0a;
-    --mc-surface: #121212;
+    --mc-black: #3E0815;
+    --mc-surface: #29050E;
     --mc-red: #e10600;
     --mc-red-glow: rgba(225, 6, 0, 0.35);
     --mc-white: #ffffff;
-    --mc-muted: #a3a3a3;
+    --mc-muted: #f2dfe4;
   }
 
   html {
     scroll-behavior: smooth;
-    background-color: #0a0a0a;
+    background-color: #3E0815;
     color: #ffffff;
   }
 
   body {
     font-family: var(--font-poppins), system-ui, -apple-system, sans-serif;
-    background-color: #0a0a0a;
+    background-color: #3E0815;
     color: #ffffff;
     overflow-x: hidden;
   }
@@ -41,8 +41,8 @@
 .film-strip-band {
   background-image: repeating-linear-gradient(
     to right,
-    #141414 0px,
-    #141414 14px,
+    #4E0B1B 0px,
+    #4E0B1B 14px,
     transparent 14px,
     transparent 26px
   );
@@ -133,7 +133,7 @@
   position: relative;
   border-radius: calc(1.25rem - 1.5px);
   overflow: hidden;
-  background: #0b0b0b;
+  background: #29050E;
 }
 
 .cinema-gear-inner::after {
@@ -173,6 +173,46 @@
   opacity: 1;
 }
 
+/* Pricing Section Typography & Festive Reel Preview Motion */
+.font-pricing-heading {
+  font-family: var(--font-poppins), system-ui, -apple-system, sans-serif;
+}
+
+.font-pricing-body {
+  font-family: var(--font-inter), system-ui, -apple-system, sans-serif;
+}
+
+@keyframes mc-reel-pan {
+  0% {
+    transform: scale(1.02) translate3d(0%, 0%, 0);
+  }
+  50% {
+    transform: scale(1.12) translate3d(-2%, -1.5%, 0);
+  }
+  100% {
+    transform: scale(1.02) translate3d(0%, 0%, 0);
+  }
+}
+
+@keyframes mc-reel-progress {
+  0% {
+    transform: scaleX(0);
+  }
+  100% {
+    transform: scaleX(1);
+  }
+}
+
+.reel-preview-motion {
+  animation: mc-reel-pan 11s ease-in-out infinite;
+  will-change: transform;
+}
+
+.reel-preview-bar {
+  transform-origin: left center;
+  animation: mc-reel-progress 11s linear infinite;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *, ::before, ::after {
     animation-duration: 0.01ms !important;
@@ -181,7 +221,8 @@
     scroll-behavior: auto !important;
   }
   .service-tilt-card:hover,
-  .cinema-gear-frame:hover {
+  .cinema-gear-frame:hover,
+  .reel-preview-motion {
     transform: none;
   }
 }

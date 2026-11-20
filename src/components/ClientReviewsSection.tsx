@@ -200,7 +200,7 @@ export function ClientReviewsSection({
   return (
     <section
       id="reviews"
-      className="py-20 lg:py-24 border-b border-white/10 bg-[#0d0d0d]"
+      className="py-20 lg:py-24 border-b border-[#D4AF37]/25 bg-[#320611]"
     >
       <div className="max-w-7xl mx-auto px-5 sm:px-8 lg:px-12">
         {/* Section Header + Live Rating Summary */}
@@ -215,7 +215,7 @@ export function ClientReviewsSection({
             </h2>
           </div>
 
-          <div className="flex flex-wrap items-center gap-4 p-4 rounded-2xl border border-white/10 bg-[#121212]">
+          <div className="flex flex-wrap items-center gap-4 p-4 rounded-2xl border border-white/10 bg-[#29050E]">
             <div className="flex items-baseline gap-1.5">
               <span className="font-display font-black italic text-3xl sm:text-4xl text-white tabular-nums">
                 {stats.avg}
@@ -248,7 +248,7 @@ export function ClientReviewsSection({
         {/* Two-Column Layout: Write a Review Form + Live Reviews Feed */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           {/* Left Column: Add Your Review Form */}
-          <div className="lg:col-span-5 lg:sticky lg:top-24 rounded-3xl border border-white/15 bg-[#121212] p-6 sm:p-8 shadow-[0_20px_50px_rgba(0,0,0,0.45)]">
+          <div className="lg:col-span-5 lg:sticky lg:top-24 rounded-3xl border border-white/15 bg-[#29050E] p-6 sm:p-8 shadow-[0_20px_50px_rgba(0,0,0,0.45)]">
             <div className="flex items-center gap-3 mb-5">
               <div className="w-10 h-10 rounded-xl bg-[#e10600]/15 border border-[#e10600]/40 text-[#e10600] flex items-center justify-center shrink-0">
                 <MessageSquareQuote className="w-5 h-5" />
@@ -278,7 +278,7 @@ export function ClientReviewsSection({
                   role="radiogroup"
                   aria-label="Select star rating from 1 to 5"
                   onMouseLeave={() => setHoverRating(0)}
-                  className="flex items-center gap-2 p-3 rounded-xl bg-[#0a0a0a] border border-white/10"
+                  className="flex items-center gap-2 p-3 rounded-xl bg-[#22040B] border border-white/10"
                 >
                   {[1, 2, 3, 4, 5].map((starValue) => {
                     const isFilled = starValue <= activeStarValue;
@@ -322,7 +322,7 @@ export function ClientReviewsSection({
                   value={clientName}
                   onChange={(e) => setClientName(e.target.value)}
                   placeholder="e.g. Rahul & Anjali Verma"
-                  className="w-full px-4 py-3 rounded-xl bg-[#0a0a0a] border border-white/15 focus:border-[#e10600] focus:outline-none text-sm text-white placeholder:text-neutral-500 transition-colors"
+                  className="w-full px-4 py-3 rounded-xl bg-[#22040B] border border-white/15 focus:border-[#e10600] focus:outline-none text-sm text-white placeholder:text-neutral-500 transition-colors"
                 />
               </div>
 
@@ -344,7 +344,7 @@ export function ClientReviewsSection({
                     value={address}
                     onChange={(e) => setAddress(e.target.value)}
                     placeholder="e.g. Ayodhya Chowk, Teghra, Begusarai"
-                    className="w-full pl-10 pr-4 py-3 rounded-xl bg-[#0a0a0a] border border-white/15 focus:border-[#e10600] focus:outline-none text-sm text-white placeholder:text-neutral-500 transition-colors"
+                    className="w-full pl-10 pr-4 py-3 rounded-xl bg-[#22040B] border border-white/15 focus:border-[#e10600] focus:outline-none text-sm text-white placeholder:text-neutral-500 transition-colors"
                   />
                 </div>
               </div>
@@ -361,10 +361,10 @@ export function ClientReviewsSection({
                   id="review-shoot-type"
                   value={shootType}
                   onChange={(e) => setShootType(e.target.value)}
-                  className="w-full px-4 py-3 rounded-xl bg-[#0a0a0a] border border-white/15 focus:border-[#e10600] focus:outline-none text-sm text-white transition-colors"
+                  className="w-full px-4 py-3 rounded-xl bg-[#22040B] border border-white/15 focus:border-[#e10600] focus:outline-none text-sm text-white transition-colors"
                 >
                   {SHOOT_TYPES.map((type) => (
-                    <option key={type} value={type} className="bg-[#121212] text-white">
+                    <option key={type} value={type} className="bg-[#29050E] text-white">
                       {type}
                     </option>
                   ))}
@@ -392,7 +392,7 @@ export function ClientReviewsSection({
                   value={comment}
                   onChange={(e) => setComment(e.target.value)}
                   placeholder="Tell us about your shoot, photo quality, team behavior, or film delivery..."
-                  className="w-full px-4 py-3 rounded-xl bg-[#0a0a0a] border border-white/15 focus:border-[#e10600] focus:outline-none text-sm text-white placeholder:text-neutral-500 resize-none transition-colors"
+                  className="w-full px-4 py-3 rounded-xl bg-[#22040B] border border-white/15 focus:border-[#e10600] focus:outline-none text-sm text-white placeholder:text-neutral-500 resize-none transition-colors"
                 />
               </div>
 
@@ -458,7 +458,7 @@ export function ClientReviewsSection({
                     className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-colors ${
                       starFilter === tab.key
                         ? 'bg-[#e10600] text-white'
-                        : 'bg-[#121212] border border-white/10 text-neutral-300 hover:border-[#e10600]/60 hover:text-white'
+                        : 'bg-[#29050E] border border-white/10 text-neutral-300 hover:border-[#e10600]/60 hover:text-white'
                     }`}
                   >
                     {tab.label}
@@ -469,7 +469,7 @@ export function ClientReviewsSection({
             </div>
 
             {visibleReviews.length === 0 ? (
-              <div className="rounded-2xl border border-white/10 bg-[#121212] p-10 text-center">
+              <div className="rounded-2xl border border-white/10 bg-[#29050E] p-10 text-center">
                 <p className="text-sm text-neutral-300 font-medium">
                   No reviews match this star filter yet.
                 </p>
@@ -488,7 +488,7 @@ export function ClientReviewsSection({
                   return (
                     <article
                       key={review.id}
-                      className="rounded-2xl border border-white/10 hover:border-[#e10600]/45 bg-[#121212] p-6 flex flex-col justify-between gap-4 transition-colors"
+                      className="rounded-2xl border border-white/10 hover:border-[#e10600]/45 bg-[#29050E] p-6 flex flex-col justify-between gap-4 transition-colors"
                     >
                       <div className="space-y-3">
                         {/* Top row: Stars + Service label */}
@@ -550,7 +550,7 @@ export function ClientReviewsSection({
                 <button
                   type="button"
                   onClick={() => setShowAll((prev) => !prev)}
-                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl border border-white/15 bg-[#121212] hover:border-[#e10600] text-xs font-semibold text-white transition-colors"
+                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl border border-white/15 bg-[#29050E] hover:border-[#e10600] text-xs font-semibold text-white transition-colors"
                 >
                   {showAll ? (
                     <>

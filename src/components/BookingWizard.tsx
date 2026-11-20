@@ -375,9 +375,9 @@ export function BookingWizard({
   };
 
   return (
-    <div className="bg-[#121215] border border-stone-800/80 rounded-2xl overflow-hidden">
+    <div className="bg-[#29050E] border border-stone-800/80 rounded-2xl overflow-hidden">
       {/* Progress Indicator Header */}
-      <div className="border-b border-stone-800/80 bg-[#0d0d10] px-6 py-5">
+      <div className="border-b border-stone-800/80 bg-[#22040B] px-6 py-5">
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
           <div>
             <p className="text-xs text-stone-400 tracking-wide">
@@ -488,7 +488,7 @@ export function BookingWizard({
                       className={`group text-left rounded-xl overflow-hidden border transition-all flex flex-col ${
                         isSelected
                           ? 'border-amber-500 bg-stone-900/90 shadow-lg'
-                          : 'border-stone-800/80 bg-[#0d0d10] hover:border-stone-700'
+                          : 'border-stone-800/80 bg-[#22040B] hover:border-stone-700'
                       }`}
                     >
                       <div className="relative h-44 w-full overflow-hidden">
@@ -657,7 +657,7 @@ export function BookingWizard({
                         className={`cursor-pointer rounded-xl border p-6 flex flex-col justify-between transition-all ${
                           isSelected
                             ? 'border-amber-500 bg-stone-900/90'
-                            : 'border-stone-800 bg-[#0d0d10] hover:border-stone-700'
+                            : 'border-stone-800 bg-[#22040B] hover:border-stone-700'
                         }`}
                       >
                         <div>
@@ -764,7 +764,7 @@ export function BookingWizard({
                       className={`p-4 rounded-xl border transition-all flex items-center justify-between gap-4 ${
                         qty > 0
                           ? 'border-amber-500/80 bg-stone-900/90'
-                          : 'border-stone-800/80 bg-[#0d0d10]'
+                          : 'border-stone-800/80 bg-[#22040B]'
                       }`}
                     >
                       <div className="min-w-0">
@@ -850,7 +850,7 @@ export function BookingWizard({
                   </div>
 
                   {/* Calendar Grid */}
-                  <div className="border border-stone-800 rounded-xl bg-[#0d0d10] p-4">
+                  <div className="border border-stone-800 rounded-xl bg-[#22040B] p-4">
                     <div className="grid grid-cols-7 gap-1.5 text-center text-xs text-stone-500 mb-2">
                       {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((d) => (
                         <div key={d} className="py-1 font-medium">
@@ -929,7 +929,7 @@ export function BookingWizard({
 
                 {/* Right Column: Time Slot & Multi-Day Controls */}
                 <div className="lg:col-span-5 space-y-5">
-                  <div className="p-5 rounded-xl border border-stone-800 bg-[#0d0d10]">
+                  <div className="p-5 rounded-xl border border-stone-800 bg-[#22040B]">
                     <h5 className="text-base font-serif text-stone-100">Selected Shoot Schedule</h5>
                     <div className="mt-3 p-3 rounded-lg bg-stone-900/90 border border-stone-800 flex items-center justify-between">
                       <div className="flex items-center gap-2.5">
@@ -1024,7 +1024,7 @@ export function BookingWizard({
                       value={customerName}
                       onChange={(e) => setCustomerName(e.target.value)}
                       placeholder="e.g. Aarav & Mira Singhania"
-                      className="w-full px-3.5 py-2.5 rounded-lg border border-stone-800 bg-[#0d0d10] text-sm text-stone-100 focus:border-amber-500 focus:outline-none"
+                      className="w-full px-3.5 py-2.5 rounded-lg border border-stone-800 bg-[#22040B] text-sm text-stone-100 focus:border-amber-500 focus:outline-none"
                     />
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -1035,7 +1035,7 @@ export function BookingWizard({
                         value={customerPhone}
                         onChange={(e) => setCustomerPhone(e.target.value)}
                         placeholder="+91 98200 55100"
-                        className="w-full px-3.5 py-2.5 rounded-lg border border-stone-800 bg-[#0d0d10] text-sm text-stone-100 focus:border-amber-500 focus:outline-none"
+                        className="w-full px-3.5 py-2.5 rounded-lg border border-stone-800 bg-[#22040B] text-sm text-stone-100 focus:border-amber-500 focus:outline-none"
                       />
                     </div>
                     <div>
@@ -1045,7 +1045,7 @@ export function BookingWizard({
                         value={customerEmail}
                         onChange={(e) => setCustomerEmail(e.target.value)}
                         placeholder="client@domain.com"
-                        className="w-full px-3.5 py-2.5 rounded-lg border border-stone-800 bg-[#0d0d10] text-sm text-stone-100 focus:border-amber-500 focus:outline-none"
+                        className="w-full px-3.5 py-2.5 rounded-lg border border-stone-800 bg-[#22040B] text-sm text-stone-100 focus:border-amber-500 focus:outline-none"
                       />
                     </div>
                   </div>
@@ -1056,7 +1056,7 @@ export function BookingWizard({
                       value={eventName}
                       onChange={(e) => setEventName(e.target.value)}
                       placeholder="e.g. The Suryagarh Palace Wedding"
-                      className="w-full px-3.5 py-2.5 rounded-lg border border-stone-800 bg-[#0d0d10] text-sm text-stone-100 focus:border-amber-500 focus:outline-none"
+                      className="w-full px-3.5 py-2.5 rounded-lg border border-stone-800 bg-[#22040B] text-sm text-stone-100 focus:border-amber-500 focus:outline-none"
                     />
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -1067,7 +1067,7 @@ export function BookingWizard({
                         value={eventVenue}
                         onChange={(e) => setEventVenue(e.target.value)}
                         placeholder="e.g. Taj Lake Palace"
-                        className="w-full px-3.5 py-2.5 rounded-lg border border-stone-800 bg-[#0d0d10] text-sm text-stone-100 focus:border-amber-500 focus:outline-none"
+                        className="w-full px-3.5 py-2.5 rounded-lg border border-stone-800 bg-[#22040B] text-sm text-stone-100 focus:border-amber-500 focus:outline-none"
                       />
                     </div>
                     <div>
@@ -1077,7 +1077,7 @@ export function BookingWizard({
                         value={city}
                         onChange={(e) => setCity(e.target.value)}
                         placeholder="Udaipur, Mumbai, Jaipur..."
-                        className="w-full px-3.5 py-2.5 rounded-lg border border-stone-800 bg-[#0d0d10] text-sm text-stone-100 focus:border-amber-500 focus:outline-none"
+                        className="w-full px-3.5 py-2.5 rounded-lg border border-stone-800 bg-[#22040B] text-sm text-stone-100 focus:border-amber-500 focus:outline-none"
                       />
                     </div>
                   </div>
@@ -1099,7 +1099,7 @@ export function BookingWizard({
                             className={`px-3 py-2 rounded-lg border text-xs text-left flex items-center justify-between transition-colors ${
                               active
                                 ? 'border-amber-500 bg-amber-500/10 text-amber-200'
-                                : 'border-stone-800 bg-[#0d0d10] text-stone-400 hover:border-stone-700'
+                                : 'border-stone-800 bg-[#22040B] text-stone-400 hover:border-stone-700'
                             }`}
                           >
                             <span className="truncate">{fn}</span>
@@ -1119,7 +1119,7 @@ export function BookingWizard({
                       value={specialInstructions}
                       onChange={(e) => setSpecialInstructions(e.target.value)}
                       placeholder="Share moodboard links, preferred film stock aesthetics, drone clearance details, or VIP family protocol..."
-                      className="w-full px-3.5 py-2.5 rounded-lg border border-stone-800 bg-[#0d0d10] text-sm text-stone-100 focus:border-amber-500 focus:outline-none"
+                      className="w-full px-3.5 py-2.5 rounded-lg border border-stone-800 bg-[#22040B] text-sm text-stone-100 focus:border-amber-500 focus:outline-none"
                     />
                   </div>
                 </div>
@@ -1141,7 +1141,7 @@ export function BookingWizard({
                   <h4 className="text-xl font-serif text-stone-100">
                     Commission Specifications & Breakdown
                   </h4>
-                  <div className="p-5 rounded-xl border border-stone-800 bg-[#0d0d10] space-y-4 text-sm">
+                  <div className="p-5 rounded-xl border border-stone-800 bg-[#22040B] space-y-4 text-sm">
                     <div className="flex justify-between pb-3 border-b border-stone-800/80">
                       <div>
                         <span className="text-xs text-stone-400 block">Selected Service</span>
@@ -1270,7 +1270,7 @@ export function BookingWizard({
               transition={{ duration: 0.18 }}
             >
               <div className="max-w-3xl mx-auto">
-                <div className="p-6 rounded-2xl border border-stone-700 bg-[#0d0d10]">
+                <div className="p-6 rounded-2xl border border-stone-700 bg-[#22040B]">
                   <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-5 border-b border-stone-800">
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 rounded-xl bg-blue-600/20 border border-blue-500/40 flex items-center justify-center text-blue-400">
@@ -1438,7 +1438,7 @@ export function BookingWizard({
                 </div>
 
                 {/* Official Receipt & Event Ledger */}
-                <div className="p-6 rounded-2xl border border-stone-800 bg-[#0d0d10] space-y-4 text-sm">
+                <div className="p-6 rounded-2xl border border-stone-800 bg-[#22040B] space-y-4 text-sm">
                   <div className="flex flex-wrap items-center justify-between gap-2 pb-4 border-b border-stone-800">
                     <div>
                       <span className="text-xs text-stone-400 block">Receipt Number</span>

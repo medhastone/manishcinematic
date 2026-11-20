@@ -187,7 +187,7 @@ export function CustomerPortal({
 
   if (loading) {
     return (
-      <div className="p-12 text-center border border-stone-800 rounded-2xl bg-[#121215]">
+      <div className="p-12 text-center border border-stone-800 rounded-2xl bg-[#29050E]">
         <p className="text-sm text-stone-400">Initializing client authentication session...</p>
       </div>
     );
@@ -196,7 +196,7 @@ export function CustomerPortal({
   return (
     <div className="space-y-6">
       {/* Top Client Authentication Banner */}
-      <div className="p-6 rounded-2xl border border-stone-800 bg-[#121215] flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+      <div className="p-6 rounded-2xl border border-stone-800 bg-[#29050E] flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
           <p className="text-xs text-stone-400">Manish Cinematic Client Concierge & Booking Vault</p>
           <h3 className="text-2xl font-serif text-stone-100 mt-0.5">
@@ -321,7 +321,7 @@ export function CustomerPortal({
           )}
 
           {(activeTab === 'upcoming' ? upcomingBookings : pastBookings).length === 0 ? (
-            <div className="p-10 rounded-2xl border border-stone-800/80 bg-[#121215] text-center space-y-3">
+            <div className="p-10 rounded-2xl border border-stone-800/80 bg-[#29050E] text-center space-y-3">
               <p className="text-base font-serif text-stone-200">
                 No {activeTab === 'upcoming' ? 'upcoming' : 'past'} studio commissions found.
               </p>
@@ -342,7 +342,7 @@ export function CustomerPortal({
               return (
                 <div
                   key={b.id}
-                  className="p-6 rounded-2xl border border-stone-800 bg-[#121215] space-y-4"
+                  className="p-6 rounded-2xl border border-stone-800 bg-[#29050E] space-y-4"
                 >
                   <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 pb-4 border-b border-stone-800/80">
                     <div>
@@ -473,7 +473,7 @@ export function CustomerPortal({
 
       {/* Tab Content: Payment History */}
       {activeTab === 'payments' && (
-        <div className="border border-stone-800 rounded-2xl bg-[#121215] overflow-hidden">
+        <div className="border border-stone-800 rounded-2xl bg-[#29050E] overflow-hidden">
           <table className="w-full text-left border-collapse text-xs">
             <thead>
               <tr className="border-b border-stone-800 bg-stone-900/80 text-stone-400">
@@ -516,7 +516,7 @@ export function CustomerPortal({
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <form
             onSubmit={handleSaveProfile}
-            className="p-6 rounded-2xl border border-stone-800 bg-[#121215] space-y-4"
+            className="p-6 rounded-2xl border border-stone-800 bg-[#29050E] space-y-4"
           >
             <h4 className="text-lg font-serif text-stone-100">Client Profile Management</h4>
             <div>
@@ -525,7 +525,7 @@ export function CustomerPortal({
                 type="text"
                 value={editName ?? profile?.name ?? ''}
                 onChange={(e) => setEditName(e.target.value)}
-                className="w-full px-3.5 py-2.5 rounded-lg border border-stone-800 bg-[#0d0d10] text-sm text-stone-100"
+                className="w-full px-3.5 py-2.5 rounded-lg border border-stone-800 bg-[#22040B] text-sm text-stone-100"
               />
             </div>
             <div>
@@ -534,7 +534,7 @@ export function CustomerPortal({
                 type="tel"
                 value={editPhone ?? profile?.phone ?? ''}
                 onChange={(e) => setEditPhone(e.target.value)}
-                className="w-full px-3.5 py-2.5 rounded-lg border border-stone-800 bg-[#0d0d10] text-sm text-stone-100"
+                className="w-full px-3.5 py-2.5 rounded-lg border border-stone-800 bg-[#22040B] text-sm text-stone-100"
               />
             </div>
             <button
@@ -546,7 +546,7 @@ export function CustomerPortal({
             </button>
           </form>
 
-          <div className="p-6 rounded-2xl border border-stone-800 bg-[#121215] space-y-4">
+          <div className="p-6 rounded-2xl border border-stone-800 bg-[#29050E] space-y-4">
             <h4 className="text-lg font-display italic text-stone-100">Direct Production Desk Contact</h4>
             <p className="text-xs text-stone-400 leading-relaxed">
               Need custom wedding cinema coverage, drone aerials, short film production, or custom packages in Begusarai & Bihar? Reach Manish Cinematic directly.
@@ -621,7 +621,7 @@ export function CustomerPortal({
       {/* Printable Receipt Modal */}
       {activeReceipt && (
         <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="max-w-lg w-full p-6 rounded-2xl border border-stone-700 bg-[#121215] space-y-4 text-xs font-mono text-stone-300">
+          <div className="max-w-lg w-full p-6 rounded-2xl border border-stone-700 bg-[#29050E] space-y-4 text-xs font-mono text-stone-300">
             <div className="flex items-center justify-between border-b border-stone-800 pb-3">
               <span className="text-sm font-bold text-stone-100">
                 MANISH CINEMATIC — OFFICIAL PAYMENT RECEIPT

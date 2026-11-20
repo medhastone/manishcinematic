@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#141414" />
+      <stop offset="100%" stop-color="#050505" />
+    </linearGradient>
+    <linearGradient id="redGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ff1e17" />
+      <stop offset="100%" stop-color="#c50500" />
+    </linearGradient>
+  </defs>
+
+  <!-- Deep Cinema Dark Rounded Canvas -->
+  <rect x="0" y="0" width="512" height="512" rx="108" fill="url(#bgGrad)" />
+
+  <!-- Subtle Crimson Outer Rim -->
+  <rect x="18" y="18" width="476" height="476" rx="92" fill="none" stroke="#e10600" stroke-opacity="0.35" stroke-width="6" />
+
+  <!-- Viewfinder L-Bracket Corners -->
+  <path d="M58 112 V72 Q58 58 72 58 H112" fill="none" stroke="#e10600" stroke-width="10" stroke-linecap="round" />
+  <path d="M400 58 H440 Q454 58 454 72 V112" fill="none" stroke="#e10600" stroke-width="10" stroke-linecap="round" />
+  <path d="M58 400 V440 Q58 454 72 454 H112" fill="none" stroke="#e10600" stroke-width="10" stroke-linecap="round" />
+  <path d="M400 454 H440 Q454 454 454 440 V400" fill="none" stroke="#e10600" stroke-width="10" stroke-linecap="round" />
+
+  <!-- Bold Geometric White "M" Monogram (Left-Center) -->
+  <path
+    d="M84 358 L120 154 L176 154 L214 256 L262 154 L318 154 L282 358 L234 358 L254 244 L208 334 L178 334 L154 244 L132 358 Z"
+    fill="#ffffff"
+  />
+
+  <!-- Signature Crimson Cinema Play Triangle Badge (Right) -->
+  <rect x="318" y="182" width="118" height="118" rx="22" fill="#e10600" fill-opacity="0.16" stroke="#e10600" stroke-width="8" />
+  <polygon points="358,208 358,274 412,241" fill="url(#redGrad)" />
+
+  <!-- Bottom Crimson Accent Bar -->
+  <rect x="132" y="394" width="248" height="14" rx="7" fill="url(#redGrad)" />
+</svg>

@@ -323,7 +323,7 @@ export function QuickBookingForm({
 
   if (savedBooking) {
     return (
-      <div className="p-8 rounded-2xl border border-[#e10600]/60 bg-[#121212] text-center space-y-5">
+      <div className="p-8 rounded-2xl border border-[#e10600]/60 bg-[#29050E] text-center space-y-5">
         <div className="w-14 h-14 rounded-full bg-[#e10600]/20 border border-[#e10600] text-[#e10600] flex items-center justify-center mx-auto">
           <Check className="w-7 h-7" />
         </div>
@@ -404,7 +404,7 @@ export function QuickBookingForm({
   return (
     <form
       onSubmit={handleSubmitOnline}
-      className="p-6 sm:p-8 rounded-2xl border border-white/10 bg-[#121212] space-y-6"
+      className="p-6 sm:p-8 rounded-2xl border border-white/10 bg-[#29050E] space-y-6"
     >
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-white/10">
         <div>
@@ -444,7 +444,7 @@ export function QuickBookingForm({
             value={name}
             onChange={(e) => setName(e.target.value)}
             placeholder="e.g. Rahul & Priya Sharma"
-            className="w-full px-4 py-3 rounded-xl bg-[#0a0a0a] border border-white/15 text-sm text-white placeholder:text-neutral-500 focus:border-[#e10600] focus:outline-none transition-colors"
+            className="w-full px-4 py-3 rounded-xl bg-[#22040B] border border-white/15 text-sm text-white placeholder:text-neutral-500 focus:border-[#e10600] focus:outline-none transition-colors"
           />
         </div>
 
@@ -459,7 +459,7 @@ export function QuickBookingForm({
             value={phone}
             onChange={(e) => setPhone(e.target.value)}
             placeholder="+91 98XXX XXXXX"
-            className="w-full px-4 py-3 rounded-xl bg-[#0a0a0a] border border-white/15 text-sm text-white placeholder:text-neutral-500 focus:border-[#e10600] focus:outline-none transition-colors"
+            className="w-full px-4 py-3 rounded-xl bg-[#22040B] border border-white/15 text-sm text-white placeholder:text-neutral-500 focus:border-[#e10600] focus:outline-none transition-colors"
           />
         </div>
 
@@ -471,7 +471,7 @@ export function QuickBookingForm({
             id="mc-service"
             value={serviceLabel}
             onChange={(e) => setServiceLabel(e.target.value)}
-            className="w-full px-4 py-3 rounded-xl bg-[#0a0a0a] border border-white/15 text-sm text-white focus:border-[#e10600] focus:outline-none transition-colors"
+            className="w-full px-4 py-3 rounded-xl bg-[#22040B] border border-white/15 text-sm text-white focus:border-[#e10600] focus:outline-none transition-colors"
           >
             {SERVICE_OPTIONS.map((opt) => (
               <option key={opt.label} value={opt.label}>
@@ -492,7 +492,7 @@ export function QuickBookingForm({
               required
               value={eventDate}
               onChange={(e) => setEventDate(e.target.value)}
-              className="w-full px-4 py-3 rounded-xl bg-[#0a0a0a] border border-white/15 text-sm text-white focus:border-[#e10600] focus:outline-none transition-colors tabular-nums"
+              className="w-full px-4 py-3 rounded-xl bg-[#22040B] border border-white/15 text-sm text-white focus:border-[#e10600] focus:outline-none transition-colors tabular-nums"
             />
             <Calendar className="w-4 h-4 text-neutral-400 absolute right-3.5 top-3.5 pointer-events-none" />
           </div>
@@ -518,7 +518,7 @@ export function QuickBookingForm({
               value={venue}
               onChange={(e) => setVenue(e.target.value)}
               placeholder="e.g. Ayodhya Chowk Tegra, Begusarai"
-              className="w-full pl-10 pr-4 py-3 rounded-xl bg-[#0a0a0a] border border-white/15 text-sm text-white placeholder:text-neutral-500 focus:border-[#e10600] focus:outline-none transition-colors"
+              className="w-full pl-10 pr-4 py-3 rounded-xl bg-[#22040B] border border-white/15 text-sm text-white placeholder:text-neutral-500 focus:border-[#e10600] focus:outline-none transition-colors"
             />
             <MapPin className="w-4 h-4 text-[#e10600] absolute left-3.5 top-3.5 pointer-events-none" />
           </div>
@@ -534,7 +534,7 @@ export function QuickBookingForm({
             value={city}
             onChange={(e) => setCity(e.target.value)}
             placeholder="Begusarai, Bihar"
-            className="w-full px-4 py-3 rounded-xl bg-[#0a0a0a] border border-white/15 text-sm text-white placeholder:text-neutral-500 focus:border-[#e10600] focus:outline-none transition-colors"
+            className="w-full px-4 py-3 rounded-xl bg-[#22040B] border border-white/15 text-sm text-white placeholder:text-neutral-500 focus:border-[#e10600] focus:outline-none transition-colors"
           />
         </div>
 
@@ -548,7 +548,7 @@ export function QuickBookingForm({
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder="yourname@gmail.com"
-            className="w-full px-4 py-3 rounded-xl bg-[#0a0a0a] border border-white/15 text-sm text-white placeholder:text-neutral-500 focus:border-[#e10600] focus:outline-none transition-colors"
+            className="w-full px-4 py-3 rounded-xl bg-[#22040B] border border-white/15 text-sm text-white placeholder:text-neutral-500 focus:border-[#e10600] focus:outline-none transition-colors"
           />
         </div>
 
@@ -562,7 +562,7 @@ export function QuickBookingForm({
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
             placeholder="Tell us about your ceremony dates (Haldi, Tilak, Shaadi, Reception) or shoot vision..."
-            className="w-full px-4 py-3 rounded-xl bg-[#0a0a0a] border border-white/15 text-sm text-white placeholder:text-neutral-500 focus:border-[#e10600] focus:outline-none transition-colors"
+            className="w-full px-4 py-3 rounded-xl bg-[#22040B] border border-white/15 text-sm text-white placeholder:text-neutral-500 focus:border-[#e10600] focus:outline-none transition-colors"
           />
         </div>
       </div>
