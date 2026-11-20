@@ -411,8 +411,9 @@ export default function ManishCinematicPage() {
   const [dbPortfolio, setDbPortfolio] = useState<PortfolioItem[]>([]);
   const [dbTestimonials, setDbTestimonials] = useState<StudioTestimonial[]>([]);
 
-  // Google Maps Embed API URL
-  const [mapEmbedUrl, setMapEmbedUrl] = useState<string>('');
+  // Free keyless Google Maps embed URL pinned to Manish Cinematic studio
+  const mapEmbedUrl =
+    'https://maps.google.com/maps?q=25.5035447,85.9278056&t=&z=16&ie=UTF8&iwloc=&output=embed';
 
   // Gallery filter & lightbox (supports both gallery photos & hero studio gear inspection)
   const [galleryFilter, setGalleryFilter] = useState<string>('All');
@@ -455,23 +456,6 @@ export default function ManishCinematicPage() {
     }
   }, []);
 
-  const fetchMapConfig = useCallback(async () => {
-    const fallbackEmbedUrl =
-      'https://maps.google.com/maps?q=25.5035447,85.9278056&t=&z=16&ie=UTF8&iwloc=&output=embed';
-    try {
-      const res = await fetch('/api/maps-embed');
-      const contentType = res.headers.get('content-type') || '';
-      if (res.ok && contentType.includes('application/json')) {
-        const data = await res.json();
-        setMapEmbedUrl(data.embedUrl || fallbackEmbedUrl);
-        return;
-      }
-    } catch {
-      // Static GitHub Pages hosting fallback
-    }
-    setMapEmbedUrl(fallbackEmbedUrl);
-  }, []);
-
   useEffect(() => {
     const id = window.setTimeout(() => {
       try {
@@ -489,10 +473,9 @@ export default function ManishCinematicPage() {
         // Ignore storage errors
       }
       void fetchCatalog();
-      void fetchMapConfig();
     }, 0);
     return () => window.clearTimeout(id);
-  }, [fetchCatalog, fetchMapConfig]);
+  }, [fetchCatalog]);
 
   // Combine curated gallery with any newly published Admin portfolio items (strictly deduplicated, zero legacy AI paths)
   const allGalleryItems = useMemo(() => {

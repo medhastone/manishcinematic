@@ -9,7 +9,6 @@ export function CinematicFloatingLayer() {
   const ringRef = useRef<HTMLDivElement | null>(null);
   const [cursorHovered, setCursorHovered] = useState(false);
   const [cursorVisible, setCursorVisible] = useState(false);
-  const [quotaExceeded, setQuotaExceeded] = useState(false);
 
   // Scroll Progress Bar
   useEffect(() => {
@@ -78,31 +77,6 @@ export function CinematicFloatingLayer() {
     };
   }, []);
 
-  // Google Maps Platform Demo Key Quota Listener (Tier 1)
-  useEffect(() => {
-    const w = window as unknown as { gm_authFailure?: () => void };
-    w.gm_authFailure = () => {
-      window.dispatchEvent(new CustomEvent('gmp-quota-exceeded'));
-    };
-
-    const origError = console.error;
-    console.error = (...args: unknown[]) => {
-      origError.apply(console, args);
-      const msg = args.map((a) => String(a)).join(' ');
-      if (msg.includes('OverQuotaMapError') || msg.includes('QuotaExceededError')) {
-        window.dispatchEvent(new CustomEvent('gmp-quota-exceeded'));
-      }
-    };
-
-    const onQuota = () => setQuotaExceeded(true);
-    window.addEventListener('gmp-quota-exceeded', onQuota);
-
-    return () => {
-      console.error = origError;
-      window.removeEventListener('gmp-quota-exceeded', onQuota);
-    };
-  }, []);
-
   const whatsappHref = `https://wa.me/918210057153?text=${encodeURIComponent(
     'Hello Manish Cinematic! I would like to inquire about booking a wedding photography / cinematography shoot in Begusarai.'
   )}`;
@@ -120,24 +94,6 @@ export function CinematicFloatingLayer() {
           style={{ transform: 'scaleX(0)' }}
         />
       </div>
-
-      {/* Google Maps Quota Exceeded Banner (renders only if triggered) */}
-      {quotaExceeded && (
-        <div className="bg-amber-50 border-b border-amber-200 text-amber-900 px-4 py-2.5 text-xs md:text-sm text-center sticky top-0 z-50 shadow-sm">
-          <span>
-            Google Maps Platform quota reached. If you are the app owner, visit{' '}
-            <a
-              href="https://developers.google.com/maps/ai/ai-studio?utm_campaign=gmp_mcp_codeassist_v1_aistudio#quota_exceeded_errors"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="underline font-semibold text-amber-950 hover:text-amber-800"
-            >
-              maps developer site
-            </a>{' '}
-            for instructions to update your account.
-          </span>
-        </div>
-      )}
 
       {/* Custom Desktop Red Cursor */}
       <div
