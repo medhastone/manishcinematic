@@ -49,6 +49,7 @@ jobs:
       - name: Build static export for GitHub Pages
         env:
           GITHUB_PAGES: "true"
+          NEXT_PUBLIC_STATIC_EXPORT: "true"
           APP_URL: "https://manishcinematic.in"
           NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION: ${{ vars.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION }}
         run: |

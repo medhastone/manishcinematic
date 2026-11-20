@@ -48,66 +48,56 @@
   );
 }
 
-/* Red WhatsApp Pulse Ring */
+/* GPU-Composited WhatsApp Pulse Ring (transform + opacity only — zero main-thread repaint) */
 @keyframes mc-pulse-ring {
   0% {
-    transform: scale(0.95);
-    box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.65);
-  }
-  70% {
     transform: scale(1);
-    box-shadow: 0 0 0 18px rgba(37, 211, 102, 0);
+    opacity: 0.65;
+  }
+  75% {
+    transform: scale(1.45);
+    opacity: 0;
   }
   100% {
-    transform: scale(0.95);
-    box-shadow: 0 0 0 0 rgba(37, 211, 102, 0);
+    transform: scale(1.45);
+    opacity: 0;
   }
 }
 
 .whatsapp-pulse {
-  animation: mc-pulse-ring 2.2s infinite;
+  isolation: isolate;
 }
 
-/* Glowing Red Border for Highlighted Starting Package */
-@keyframes mc-red-border-glow {
-  0%, 100% {
-    box-shadow: 0 0 24px rgba(225, 6, 0, 0.32), inset 0 0 16px rgba(225, 6, 0, 0.08);
-  }
-  50% {
-    box-shadow: 0 0 42px rgba(225, 6, 0, 0.58), inset 0 0 22px rgba(225, 6, 0, 0.16);
-  }
+.whatsapp-pulse::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 9999px;
+  background: rgba(37, 211, 102, 0.55);
+  animation: mc-pulse-ring 2.2s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+  pointer-events: none;
+  z-index: -1;
+  will-change: transform, opacity;
 }
 
+/* Luminous Static Border Glow (composited-safe, zero paint thrashing) */
 .package-red-glow {
-  animation: mc-red-border-glow 3s ease-in-out infinite;
+  box-shadow: 0 0 32px rgba(225, 6, 0, 0.38), inset 0 0 18px rgba(225, 6, 0, 0.1);
 }
 
 /* Subtle 3D Tilt & Red Glow on Service Cards */
 .service-tilt-card {
   transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1),
-    border-color 0.25s ease,
-    box-shadow 0.25s ease;
+    border-color 0.25s ease;
   will-change: transform;
 }
 
 .service-tilt-card:hover {
   transform: perspective(900px) rotateX(2.5deg) rotateY(-2.5deg) translateY(-4px);
   border-color: rgba(225, 6, 0, 0.75);
-  box-shadow: 0 18px 40px -12px rgba(225, 6, 0, 0.28);
 }
 
-/* Precision Cinema Equipment Frame with Animated Crimson Bevel Outline */
-@keyframes mc-outline-breathe {
-  0%, 100% {
-    box-shadow: 0 0 0 1px rgba(225, 6, 0, 0.35), 0 18px 44px -16px rgba(0, 0, 0, 0.85),
-      0 0 26px -6px rgba(225, 6, 0, 0.22);
-  }
-  50% {
-    box-shadow: 0 0 0 1px rgba(225, 6, 0, 0.72), 0 22px 52px -14px rgba(0, 0, 0, 0.9),
-      0 0 38px -4px rgba(225, 6, 0, 0.42);
-  }
-}
-
+/* Precision Cinema Equipment Frame with Static Luminous Bevel Outline */
 .cinema-gear-frame {
   position: relative;
   border-radius: 1.25rem;
@@ -115,18 +105,16 @@
   background: linear-gradient(
     135deg,
     rgba(225, 6, 0, 0.85) 0%,
-    rgba(255, 255, 255, 0.16) 45%,
-    rgba(255, 255, 255, 0.06) 65%,
+    rgba(212, 175, 55, 0.35) 45%,
+    rgba(255, 255, 255, 0.08) 65%,
     rgba(225, 6, 0, 0.65) 100%
   );
-  animation: mc-outline-breathe 4.2s ease-in-out infinite;
-  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1),
-    filter 0.35s ease;
+  box-shadow: 0 18px 42px -16px rgba(0, 0, 0, 0.72), 0 0 26px -6px rgba(225, 6, 0, 0.28);
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .cinema-gear-frame:hover {
   transform: translateY(-5px) scale(1.015);
-  filter: drop-shadow(0 0 20px rgba(225, 6, 0, 0.35));
 }
 
 .cinema-gear-inner {

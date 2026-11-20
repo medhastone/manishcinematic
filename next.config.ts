@@ -41,6 +41,31 @@ const nextConfig: NextConfig = {
       }
     : {}),
   transpilePackages: ['motion'],
+  ...(!isGithubPages
+    ? {
+        async headers() {
+          return [
+            {
+              source: '/assets/:path*',
+              headers: [
+                {
+                  key: 'Cache-Control',
+                  value: 'public, max-age=31536000, immutable',
+                },
+              ],
+            },
+            {
+              source: '/(.*)',
+              headers: [
+                { key: 'X-Content-Type-Options', value: 'nosniff' },
+                { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
+                { key: 'Cross-Origin-Opener-Policy', value: 'same-origin-allow-popups' },
+              ],
+            },
+          ];
+        },
+      }
+    : {}),
   webpack: (config, {dev}) => {
     // HMR is disabled in AI Studio via DISABLE_HMR env var.
     // Do not modify—file watching is disabled to prevent flickering during agent edits.

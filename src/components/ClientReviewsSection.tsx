@@ -127,32 +127,36 @@ export function ClientReviewsSection({
       let savedReview: StudioTestimonial | null = null;
       let shouldFallbackToLocal = false;
 
-      try {
-        const res = await fetch('/api/reviews', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            clientName: cleanName,
-            address: cleanAddress,
-            shootType,
-            comment: cleanComment,
-            rating,
-          }),
-        });
-
-        const contentType = res.headers.get('content-type') || '';
-        if (res.status === 404 || res.status === 405 || !contentType.includes('application/json')) {
-          shouldFallbackToLocal = true;
-        } else {
-          const data = await res.json();
-          if (!res.ok) {
-            setErrorMsg(data.error || 'Unable to submit review. Please try again.');
-            return;
-          }
-          savedReview = data.review || null;
-        }
-      } catch {
+      if (process.env.NEXT_PUBLIC_STATIC_EXPORT === 'true') {
         shouldFallbackToLocal = true;
+      } else {
+        try {
+          const res = await fetch('/api/reviews', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              clientName: cleanName,
+              address: cleanAddress,
+              shootType,
+              comment: cleanComment,
+              rating,
+            }),
+          });
+
+          const contentType = res.headers.get('content-type') || '';
+          if (res.status === 404 || res.status === 405 || !contentType.includes('application/json')) {
+            shouldFallbackToLocal = true;
+          } else {
+            const data = await res.json();
+            if (!res.ok) {
+              setErrorMsg(data.error || 'Unable to submit review. Please try again.');
+              return;
+            }
+            savedReview = data.review || null;
+          }
+        } catch {
+          shouldFallbackToLocal = true;
+        }
       }
 
       if (shouldFallbackToLocal || !savedReview) {
@@ -206,7 +210,7 @@ export function ClientReviewsSection({
         {/* Section Header + Live Rating Summary */}
         <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 mb-12">
           <div>
-            <p className="font-script text-2xl text-[#e10600]">Words From Our Clients</p>
+            <p className="font-script text-2xl text-[#F3D27A]">Words From Our Clients</p>
             <h2
               className="font-display font-black italic uppercase text-3xl sm:text-5xl text-white mt-1 tracking-tight"
               style={{ textWrap: 'balance' }}
@@ -220,24 +224,28 @@ export function ClientReviewsSection({
               <span className="font-display font-black italic text-3xl sm:text-4xl text-white tabular-nums">
                 {stats.avg}
               </span>
-              <span className="text-xs text-neutral-400">/ 5.0</span>
+              <span className="text-xs text-neutral-300">/ 5.0</span>
             </div>
             <div className="h-9 w-px bg-white/10 hidden sm:block" />
             <div>
-              <div className="flex items-center gap-1" aria-label={`Average rating ${stats.avg} out of 5`}>
+              <div
+                role="img"
+                className="flex items-center gap-1"
+                aria-label={`Average rating ${stats.avg} out of 5`}
+              >
                 {[1, 2, 3, 4, 5].map((starNum) => (
                   <Star
                     key={starNum}
                     className={`w-4 h-4 ${
                       starNum <= Math.round(Number(stats.avg))
-                        ? 'text-[#e10600] fill-[#e10600]'
-                        : 'text-neutral-600'
+                        ? 'text-[#F3D27A] fill-[#F3D27A]'
+                        : 'text-neutral-500'
                     }`}
                     aria-hidden="true"
                   />
                 ))}
               </div>
-              <p className="text-xs text-neutral-400 mt-1 tabular-nums">
+              <p className="text-xs text-neutral-300 mt-1 tabular-nums">
                 Based on <span className="text-white font-semibold">{stats.count}</span>{' '}
                 {stats.count === 1 ? 'review' : 'reviews'}
               </p>
@@ -267,10 +275,10 @@ export function ClientReviewsSection({
               {/* Interactive Star Rating Selector */}
               <div>
                 <div className="flex items-center justify-between mb-2">
-                  <label className="text-xs font-semibold uppercase tracking-wider text-neutral-300">
-                    Your Rating <span className="text-[#e10600]">*</span>
+                  <label className="text-xs font-semibold uppercase tracking-wider text-neutral-200">
+                    Your Rating <span className="text-[#F3D27A]">*</span>
                   </label>
-                  <span className="text-xs font-semibold text-[#e10600]">
+                  <span className="text-xs font-semibold text-[#F3D27A]">
                     {activeStarValue} / 5 · {RATING_LABELS[activeStarValue]}
                   </span>
                 </div>
@@ -494,6 +502,7 @@ export function ClientReviewsSection({
                         {/* Top row: Stars + Service label */}
                         <div className="flex items-center justify-between gap-2">
                           <div
+                            role="img"
                             className="flex items-center gap-0.5"
                             aria-label={`Rated ${stars} out of 5 stars`}
                           >
@@ -502,8 +511,8 @@ export function ClientReviewsSection({
                                 key={s}
                                 className={`w-3.5 h-3.5 ${
                                   s <= stars
-                                    ? 'text-[#e10600] fill-[#e10600]'
-                                    : 'text-neutral-700'
+                                    ? 'text-[#F3D27A] fill-[#F3D27A]'
+                                    : 'text-neutral-600'
                                 }`}
                                 aria-hidden="true"
                               />
@@ -512,28 +521,28 @@ export function ClientReviewsSection({
                               {stars}.0
                             </span>
                           </div>
-                          <span className="text-[10px] font-semibold uppercase tracking-wider text-neutral-400 bg-white/5 border border-white/10 px-2 py-0.5 rounded">
+                          <span className="text-[10px] font-semibold uppercase tracking-wider text-neutral-200 bg-white/5 border border-white/10 px-2 py-0.5 rounded">
                             {review.clientRole || 'Client Review'}
                           </span>
                         </div>
 
                         {/* Comment Quote */}
-                        <p className="text-sm text-neutral-200 leading-relaxed">
+                        <p className="text-sm text-neutral-100 leading-relaxed">
                           &ldquo;{review.quote}&rdquo;
                         </p>
                       </div>
 
                       {/* Footer: Client Avatar + Name + Address */}
                       <div className="pt-3 border-t border-white/10 flex items-center gap-3">
-                        <div className="w-9 h-9 rounded-full bg-[#e10600]/15 border border-[#e10600]/40 text-[#e10600] font-display font-extrabold italic text-xs flex items-center justify-center shrink-0">
+                        <div className="w-9 h-9 rounded-full bg-[#D4AF37]/20 border border-[#D4AF37]/50 text-[#F3D27A] font-display font-extrabold italic text-xs flex items-center justify-center shrink-0">
                           {getInitials(review.clientName)}
                         </div>
                         <div className="min-w-0">
-                          <h4 className="font-display font-bold italic text-sm text-white truncate">
+                          <h3 className="font-display font-bold italic text-sm text-white truncate">
                             {review.clientName}
-                          </h4>
-                          <p className="text-xs text-neutral-400 flex items-center gap-1 truncate mt-0.5">
-                            <MapPin className="w-3 h-3 text-[#e10600] shrink-0" />
+                          </h3>
+                          <p className="text-xs text-neutral-300 flex items-center gap-1 truncate mt-0.5">
+                            <MapPin className="w-3 h-3 text-[#F3D27A] shrink-0" />
                             <span className="truncate">{review.eventLocation}</span>
                           </p>
                         </div>

@@ -9,14 +9,35 @@ interface ResilientImageProps {
   className?: string;
   fallbackTitle?: string;
   loading?: 'lazy' | 'eager';
+  fetchPriority?: 'high' | 'low' | 'auto';
+  srcSet?: string;
+  sizes?: string;
+  width?: number;
+  height?: number;
 }
 
 const BASE_PATH = (process.env.NEXT_PUBLIC_BASE_PATH || '').replace(/\/+$/, '');
 
-function resolveAssetSrc(src: string): string {
-  if (!src || !BASE_PATH) return src;
-  if (src.startsWith('/') && !src.startsWith('//') && !src.startsWith(`${BASE_PATH}/`)) {
-    return `${BASE_PATH}${src}`;
+function withBasePath(path: string): string {
+  if (!path || !BASE_PATH) return path;
+  if (path.startsWith('/') && !path.startsWith('//') && !path.startsWith(`${BASE_PATH}/`)) {
+    return `${BASE_PATH}${path}`;
+  }
+  return path;
+}
+
+/**
+ * Automatically upgrades local studio JPEG assets to pre-compressed WebP equivalents
+ * under /assets/opt/ while falling back to the original URL if ever unavailable.
+ */
+function toOptimizedWebpSrc(src: string): string {
+  if (!src) return src;
+  if (src === '/assets/cinema_hero_backdrop_1795170914610.jpg') {
+    return '/assets/opt/cinema_hero_backdrop.webp';
+  }
+  const aiMatch = src.match(/^\/assets\/aistudio\/([^/]+)\.(jpg|jpeg|png)$/i);
+  if (aiMatch) {
+    return `/assets/opt/aistudio/${aiMatch[1]}.webp`;
   }
   return src;
 }
@@ -27,16 +48,36 @@ export function ResilientImage({
   className = '',
   fallbackTitle,
   loading = 'lazy',
+  fetchPriority,
+  srcSet,
+  sizes,
+  width,
+  height,
 }: ResilientImageProps) {
+  const [useOriginalFallback, setUseOriginalFallback] = useState(false);
   const [hasError, setHasError] = useState(false);
-  const resolvedSrc = resolveAssetSrc(src);
 
-  if (hasError || !resolvedSrc) {
+  const optimizedSrc = toOptimizedWebpSrc(src);
+  const activeSrc = withBasePath(useOriginalFallback ? src : optimizedSrc);
+
+  const resolvedSrcSet =
+    !useOriginalFallback && srcSet
+      ? srcSet
+          .split(',')
+          .map((entry) => {
+            const parts = entry.trim().split(/\s+/);
+            if (!parts[0]) return entry;
+            return [withBasePath(parts[0]), ...parts.slice(1)].join(' ');
+          })
+          .join(', ')
+      : undefined;
+
+  if (hasError || !activeSrc) {
     return (
       <div
         className={`flex flex-col items-center justify-center bg-gradient-to-br from-[#4E0B1B] via-[#3E0815] to-[#2B060F] text-neutral-200 p-6 text-center ${className}`}
       >
-        <Camera className="w-8 h-8 text-[#e10600] mb-2 stroke-[1.5]" />
+        <Camera className="w-8 h-8 text-[#F3D27A] mb-2 stroke-[1.5]" />
         <span className="font-display italic text-sm tracking-wide text-white">
           {fallbackTitle || alt}
         </span>
@@ -46,12 +87,23 @@ export function ResilientImage({
 
   return (
     <img
-      src={resolvedSrc}
+      src={activeSrc}
+      srcSet={resolvedSrcSet}
+      sizes={resolvedSrcSet ? sizes : undefined}
+      width={width}
+      height={height}
       alt={alt}
       loading={loading}
-      decoding="async"
+      decoding={loading === 'eager' ? 'sync' : 'async'}
+      fetchPriority={fetchPriority}
       referrerPolicy="no-referrer"
-      onError={() => setHasError(true)}
+      onError={() => {
+        if (!useOriginalFallback && optimizedSrc !== src) {
+          setUseOriginalFallback(true);
+        } else {
+          setHasError(true);
+        }
+      }}
       className={className}
     />
   );

@@ -213,52 +213,54 @@ export function QuickBookingForm({
         recipient: STUDIO_EMAIL,
         message: 'Dispatching email notification...',
       };
-      let shouldFallbackToStatic = false;
+      let shouldFallbackToStatic = process.env.NEXT_PUBLIC_STATIC_EXPORT === 'true';
 
-      try {
-        const res = await fetch('/api/bookings', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            ...(token ? { Authorization: `Bearer ${token}` } : {}),
-          },
-          body: JSON.stringify({
-            customerName: name.trim(),
-            customerEmail: email.trim() || `${phone.replace(/\D/g, '')}@manishcinematic.in`,
-            customerPhone: phone.trim(),
-            serviceSlug: matchedService.slug,
-            packageId: fallbackPkg?.id || 1,
-            selectedAddons: [],
-            eventFunctions: [serviceLabel],
-            eventName: `${name.trim()} — ${serviceLabel}`,
-            eventVenue: venue.trim() || 'Begusarai Venue',
-            city: city.trim() || 'Begusarai, Bihar',
-            eventDate,
-            eventEndDate: eventDate,
-            eventStartTime: '10:00 AM',
-            eventDurationHours: 8,
-            specialInstructions: notes.trim(),
-          }),
-        });
+      if (!shouldFallbackToStatic) {
+        try {
+          const res = await fetch('/api/bookings', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              ...(token ? { Authorization: `Bearer ${token}` } : {}),
+            },
+            body: JSON.stringify({
+              customerName: name.trim(),
+              customerEmail: email.trim() || `${phone.replace(/\D/g, '')}@manishcinematic.in`,
+              customerPhone: phone.trim(),
+              serviceSlug: matchedService.slug,
+              packageId: fallbackPkg?.id || 1,
+              selectedAddons: [],
+              eventFunctions: [serviceLabel],
+              eventName: `${name.trim()} — ${serviceLabel}`,
+              eventVenue: venue.trim() || 'Begusarai Venue',
+              city: city.trim() || 'Begusarai, Bihar',
+              eventDate,
+              eventEndDate: eventDate,
+              eventStartTime: '10:00 AM',
+              eventDurationHours: 8,
+              specialInstructions: notes.trim(),
+            }),
+          });
 
-        const contentType = res.headers.get('content-type') || '';
-        if (res.status === 404 || res.status === 405 || !contentType.includes('application/json')) {
-          shouldFallbackToStatic = true;
-        } else {
-          const data = await res.json();
-          if (!res.ok) {
-            throw new Error(data.error || 'Could not save booking inquiry.');
+          const contentType = res.headers.get('content-type') || '';
+          if (res.status === 404 || res.status === 405 || !contentType.includes('application/json')) {
+            shouldFallbackToStatic = true;
+          } else {
+            const data = await res.json();
+            if (!res.ok) {
+              throw new Error(data.error || 'Could not save booking inquiry.');
+            }
+            createdBooking = data.booking;
+            if (data.emailNotification) {
+              finalEmailStatus = data.emailNotification;
+            }
           }
-          createdBooking = data.booking;
-          if (data.emailNotification) {
-            finalEmailStatus = data.emailNotification;
+        } catch (fetchErr) {
+          if (fetchErr instanceof TypeError) {
+            shouldFallbackToStatic = true;
+          } else {
+            throw fetchErr;
           }
-        }
-      } catch (fetchErr) {
-        if (fetchErr instanceof TypeError) {
-          shouldFallbackToStatic = true;
-        } else {
-          throw fetchErr;
         }
       }
 
@@ -444,7 +446,7 @@ export function QuickBookingForm({
             value={name}
             onChange={(e) => setName(e.target.value)}
             placeholder="e.g. Rahul & Priya Sharma"
-            className="w-full px-4 py-3 rounded-xl bg-[#22040B] border border-white/15 text-sm text-white placeholder:text-neutral-500 focus:border-[#e10600] focus:outline-none transition-colors"
+            className="w-full px-4 py-3 rounded-xl bg-[#22040B] border border-white/15 text-sm text-white placeholder:text-neutral-400 focus:border-[#e10600] focus:outline-none transition-colors"
           />
         </div>
 
@@ -459,7 +461,7 @@ export function QuickBookingForm({
             value={phone}
             onChange={(e) => setPhone(e.target.value)}
             placeholder="+91 98XXX XXXXX"
-            className="w-full px-4 py-3 rounded-xl bg-[#22040B] border border-white/15 text-sm text-white placeholder:text-neutral-500 focus:border-[#e10600] focus:outline-none transition-colors"
+            className="w-full px-4 py-3 rounded-xl bg-[#22040B] border border-white/15 text-sm text-white placeholder:text-neutral-400 focus:border-[#e10600] focus:outline-none transition-colors"
           />
         </div>
 
@@ -518,7 +520,7 @@ export function QuickBookingForm({
               value={venue}
               onChange={(e) => setVenue(e.target.value)}
               placeholder="e.g. Ayodhya Chowk Tegra, Begusarai"
-              className="w-full pl-10 pr-4 py-3 rounded-xl bg-[#22040B] border border-white/15 text-sm text-white placeholder:text-neutral-500 focus:border-[#e10600] focus:outline-none transition-colors"
+              className="w-full pl-10 pr-4 py-3 rounded-xl bg-[#22040B] border border-white/15 text-sm text-white placeholder:text-neutral-400 focus:border-[#e10600] focus:outline-none transition-colors"
             />
             <MapPin className="w-4 h-4 text-[#e10600] absolute left-3.5 top-3.5 pointer-events-none" />
           </div>
@@ -534,7 +536,7 @@ export function QuickBookingForm({
             value={city}
             onChange={(e) => setCity(e.target.value)}
             placeholder="Begusarai, Bihar"
-            className="w-full px-4 py-3 rounded-xl bg-[#22040B] border border-white/15 text-sm text-white placeholder:text-neutral-500 focus:border-[#e10600] focus:outline-none transition-colors"
+            className="w-full px-4 py-3 rounded-xl bg-[#22040B] border border-white/15 text-sm text-white placeholder:text-neutral-400 focus:border-[#e10600] focus:outline-none transition-colors"
           />
         </div>
 
@@ -548,7 +550,7 @@ export function QuickBookingForm({
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder="yourname@gmail.com"
-            className="w-full px-4 py-3 rounded-xl bg-[#22040B] border border-white/15 text-sm text-white placeholder:text-neutral-500 focus:border-[#e10600] focus:outline-none transition-colors"
+            className="w-full px-4 py-3 rounded-xl bg-[#22040B] border border-white/15 text-sm text-white placeholder:text-neutral-400 focus:border-[#e10600] focus:outline-none transition-colors"
           />
         </div>
 
@@ -562,7 +564,7 @@ export function QuickBookingForm({
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
             placeholder="Tell us about your ceremony dates (Haldi, Tilak, Shaadi, Reception) or shoot vision..."
-            className="w-full px-4 py-3 rounded-xl bg-[#22040B] border border-white/15 text-sm text-white placeholder:text-neutral-500 focus:border-[#e10600] focus:outline-none transition-colors"
+            className="w-full px-4 py-3 rounded-xl bg-[#22040B] border border-white/15 text-sm text-white placeholder:text-neutral-400 focus:border-[#e10600] focus:outline-none transition-colors"
           />
         </div>
       </div>

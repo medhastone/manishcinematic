@@ -1,8 +1,7 @@
 'use client';
 
 import React, { useEffect, useState, useCallback, useRef, useMemo } from 'react';
-import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import dynamic from 'next/dynamic';
 import {
   Menu,
   X,
@@ -26,6 +25,7 @@ import {
   ExternalLink,
   ArrowRight,
   UserCheck,
+  Globe,
 } from 'lucide-react';
 import {
   StudioService,
@@ -41,10 +41,18 @@ import { ManishLogo } from '@/src/components/ManishLogo';
 import { ResilientImage } from '@/src/components/ResilientImage';
 import { CinematicFloatingLayer } from '@/src/components/CinematicFloatingLayer';
 import { QuickBookingForm } from '@/src/components/QuickBookingForm';
-import { BookingWizard } from '@/src/components/BookingWizard';
-import { CustomerPortal } from '@/src/components/CustomerPortal';
 import { ClientReviewsSection } from '@/src/components/ClientReviewsSection';
 import { PackagesPricingSection } from '@/src/components/PackagesPricingSection';
+
+const BookingWizard = dynamic(
+  () => import('@/src/components/BookingWizard').then((m) => m.BookingWizard),
+  { ssr: false }
+);
+
+const CustomerPortal = dynamic(
+  () => import('@/src/components/CustomerPortal').then((m) => m.CustomerPortal),
+  { ssr: false }
+);
 
 // ============================================================================
 // EDITABLE STUDIO CONFIGURATION (Manish Cinematic — Begusarai, Bihar)
@@ -455,6 +463,9 @@ export default function ManishCinematicPage() {
   const processTrackRef = useRef<HTMLDivElement | null>(null);
 
   const fetchCatalog = useCallback(async () => {
+    if (process.env.NEXT_PUBLIC_STATIC_EXPORT === 'true') {
+      return;
+    }
     try {
       const res = await fetch('/api/catalog');
       if (res.ok) {
@@ -466,8 +477,8 @@ export default function ManishCinematicPage() {
         setDbPortfolio(data.portfolioItems || []);
         setDbTestimonials(data.testimonials || []);
       }
-    } catch (err) {
-      console.error('Failed to fetch studio catalog:', err);
+    } catch {
+      // Static deployments use local curated studio data without backend API
     }
   }, []);
 
@@ -571,204 +582,136 @@ export default function ManishCinematicPage() {
     return () => window.removeEventListener('keydown', onKeyDown);
   }, [lightboxIdx, lightboxItems.length]);
 
-  // GSAP + ScrollTrigger Orchestration
+  // Deferred GSAP + ScrollTrigger Orchestration (below-the-fold only, zero LCP/FCP blocking)
   useEffect(() => {
     if (activeView !== 'home') return;
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (reducedMotion) return;
 
-    gsap.registerPlugin(ScrollTrigger);
+    let cancelled = false;
+    let ctx: { revert: () => void } | null = null;
 
-    const ctx = gsap.context(() => {
-      // 1. Hero slow zoom background
-      gsap.fromTo(
-        '.mc-hero-bg',
-        { scale: 1.0 },
-        {
-          scale: 1.13,
-          duration: 16,
-          ease: 'none',
-          repeat: -1,
-          yoyo: true,
-        }
-      );
+    const timerId = window.setTimeout(async () => {
+      try {
+        const [{ default: gsapModule }, { ScrollTrigger: ScrollTriggerModule }] = await Promise.all([
+          import('gsap'),
+          import('gsap/ScrollTrigger'),
+        ]);
+        if (cancelled) return;
 
-      // 2. Hero line-by-line text reveal
-      gsap.from('.mc-hero-line', {
-        y: 44,
-        opacity: 0,
-        duration: 0.85,
-        stagger: 0.14,
-        ease: 'power3.out',
-        clearProps: 'transform,opacity',
-      });
+        gsapModule.registerPlugin(ScrollTriggerModule);
 
-      // 3. Staggered reveal + anti-phase floating motion + scroll parallax on the 3 Hero equipment frames
-      gsap.from('.mc-gear-card', {
-        y: 36,
-        scale: 0.93,
-        opacity: 0,
-        duration: 0.85,
-        stagger: 0.14,
-        ease: 'power3.out',
-        clearProps: 'opacity,scale',
-      });
+        ctx = gsapModule.context(() => {
+          // 1. Stats Counters count-up on scroll
+          document.querySelectorAll<HTMLElement>('.mc-stat-number').forEach((el) => {
+            const target = Number(el.dataset.target || '0');
+            const suffix = el.dataset.suffix || '';
+            const obj = { val: 0 };
+            gsapModule.to(obj, {
+              val: target,
+              duration: 1.6,
+              ease: 'power2.out',
+              scrollTrigger: {
+                trigger: '#stats',
+                start: 'top 88%',
+                once: true,
+              },
+              onUpdate: () => {
+                el.textContent = `${Math.round(obj.val)}${suffix}`;
+              },
+            });
+          });
 
-      gsap.to('.mc-gear-float-main', {
-        y: -10,
-        duration: 3.6,
-        ease: 'sine.inOut',
-        repeat: -1,
-        yoyo: true,
-      });
+          // 2. Pro Cinema Equipment cards reveal on scroll
+          gsapModule.from('.mc-arsenal-card', {
+            y: 26,
+            opacity: 0,
+            duration: 0.55,
+            stagger: 0.08,
+            ease: 'power2.out',
+            clearProps: 'transform,opacity',
+            scrollTrigger: {
+              trigger: '#equipment',
+              start: 'top 85%',
+              once: true,
+            },
+          });
 
-      gsap.to('.mc-gear-float-left', {
-        y: -13,
-        rotation: -0.9,
-        duration: 3.1,
-        delay: 0.4,
-        ease: 'sine.inOut',
-        repeat: -1,
-        yoyo: true,
-      });
+          // 3. Service cards reveal on scroll
+          gsapModule.from('.mc-service-card', {
+            y: 28,
+            opacity: 0,
+            duration: 0.55,
+            stagger: 0.08,
+            ease: 'power2.out',
+            clearProps: 'transform,opacity',
+            scrollTrigger: {
+              trigger: '#services',
+              start: 'top 82%',
+              once: true,
+            },
+          });
 
-      gsap.to('.mc-gear-float-right', {
-        y: -15,
-        rotation: 0.9,
-        duration: 3.4,
-        delay: 0.85,
-        ease: 'sine.inOut',
-        repeat: -1,
-        yoyo: true,
-      });
+          // 4. Film-strip decorative parallax scroll
+          gsapModule.to('.mc-film-strip', {
+            xPercent: -25,
+            ease: 'none',
+            scrollTrigger: {
+              trigger: '.mc-film-strip-wrap',
+              start: 'top bottom',
+              end: 'bottom top',
+              scrub: 1,
+            },
+          });
 
-      gsap.to('.mc-camera-parallax', {
-        y: -55,
-        ease: 'none',
-        scrollTrigger: {
-          trigger: '#home',
-          start: 'top top',
-          end: 'bottom top',
-          scrub: 1.1,
-        },
-      });
+          // 5. Pinned Horizontal Scroll "Our Process" (Desktop >= 1024px)
+          const mm = gsapModule.matchMedia();
+          mm.add('(min-width: 1024px)', () => {
+            const section = processSectionRef.current;
+            const track = processTrackRef.current;
+            if (!section || !track) return;
 
-      gsap.to('.mc-gear-parallax-sub', {
-        y: -85,
-        ease: 'none',
-        scrollTrigger: {
-          trigger: '#home',
-          start: 'top top',
-          end: 'bottom top',
-          scrub: 1.4,
-        },
-      });
+            const getScrollAmount = () => -(track.scrollWidth - window.innerWidth + 120);
 
-      // 4. Stats Counters count-up on scroll
-      document.querySelectorAll<HTMLElement>('.mc-stat-number').forEach((el) => {
-        const target = Number(el.dataset.target || '0');
-        const suffix = el.dataset.suffix || '';
-        const obj = { val: 0 };
-        gsap.to(obj, {
-          val: target,
-          duration: 1.8,
-          ease: 'power2.out',
-          scrollTrigger: {
-            trigger: '#stats',
-            start: 'top 85%',
-            once: true,
-          },
-          onUpdate: () => {
-            el.textContent = `${Math.round(obj.val)}${suffix}`;
-          },
-        });
-      });
+            gsapModule.to(track, {
+              x: getScrollAmount,
+              ease: 'none',
+              scrollTrigger: {
+                trigger: section,
+                start: 'top 80px',
+                end: () => `+=${Math.max(900, track.scrollWidth - window.innerWidth + 240)}`,
+                pin: true,
+                scrub: 1,
+                invalidateOnRefresh: true,
+              },
+            });
+          });
 
-      // 4b. Pro Cinema Equipment cards stagger reveal on scroll
-      gsap.from('.mc-arsenal-card', {
-        y: 34,
-        opacity: 0,
-        scale: 0.96,
-        duration: 0.65,
-        stagger: 0.09,
-        ease: 'power3.out',
-        clearProps: 'transform,opacity',
-        scrollTrigger: {
-          trigger: '#equipment',
-          start: 'top 82%',
-          once: true,
-        },
-      });
-
-      // 5. Service cards stagger reveal on scroll
-      gsap.from('.mc-service-card', {
-        y: 36,
-        opacity: 0,
-        duration: 0.65,
-        stagger: 0.1,
-        ease: 'power3.out',
-        clearProps: 'transform,opacity',
-        scrollTrigger: {
-          trigger: '#services',
-          start: 'top 78%',
-          once: true,
-        },
-      });
-
-      // 6. Film-strip decorative parallax scroll
-      gsap.to('.mc-film-strip', {
-        xPercent: -25,
-        ease: 'none',
-        scrollTrigger: {
-          trigger: '.mc-film-strip-wrap',
-          start: 'top bottom',
-          end: 'bottom top',
-          scrub: 1,
-        },
-      });
-
-      // 7. Pinned Horizontal Scroll "Our Process" (Desktop >= 1024px)
-      const mm = gsap.matchMedia();
-      mm.add('(min-width: 1024px)', () => {
-        const section = processSectionRef.current;
-        const track = processTrackRef.current;
-        if (!section || !track) return;
-
-        const getScrollAmount = () => -(track.scrollWidth - window.innerWidth + 120);
-
-        gsap.to(track, {
-          x: getScrollAmount,
-          ease: 'none',
-          scrollTrigger: {
-            trigger: section,
-            start: 'top 80px',
-            end: () => `+=${Math.max(900, track.scrollWidth - window.innerWidth + 240)}`,
-            pin: true,
-            scrub: 1,
-            invalidateOnRefresh: true,
-          },
-        });
-      });
-
-      // 8. Gallery cards fade & scale in on scroll
-      gsap.from('.mc-gallery-item', {
-        scale: 0.94,
-        opacity: 0,
-        y: 24,
-        duration: 0.6,
-        stagger: 0.08,
-        ease: 'power2.out',
-        clearProps: 'transform,opacity',
-        scrollTrigger: {
-          trigger: '#gallery',
-          start: 'top 80%',
-          once: true,
-        },
-      });
-    }, mainRef);
+          // 6. Gallery cards reveal on scroll
+          gsapModule.from('.mc-gallery-item', {
+            scale: 0.96,
+            opacity: 0,
+            y: 20,
+            duration: 0.5,
+            stagger: 0.06,
+            ease: 'power2.out',
+            clearProps: 'transform,opacity',
+            scrollTrigger: {
+              trigger: '#gallery',
+              start: 'top 84%',
+              once: true,
+            },
+          });
+        }, mainRef);
+      } catch {
+        // Progressive enhancement: page stays fully visible without GSAP
+      }
+    }, 180);
 
     return () => {
-      ctx.revert();
+      cancelled = true;
+      window.clearTimeout(timerId);
+      ctx?.revert();
     };
   }, [activeView]);
 
@@ -945,8 +888,13 @@ export default function ManishCinematicPage() {
               <div className="mc-hero-bg relative w-full h-full">
                 <ResilientImage
                   src="/assets/cinema_hero_backdrop_1795170914610.jpg"
+                  srcSet="/assets/opt/cinema_hero_backdrop_sm.webp 720w, /assets/opt/cinema_hero_backdrop.webp 1280w"
+                  sizes="100vw"
                   alt="Professional cinema camera rig and 4K Indian wedding film color grading workstation"
                   loading="eager"
+                  fetchPriority="high"
+                  width={1280}
+                  height={720}
                   className="w-full h-full object-cover object-center lg:object-[62%_center] opacity-65 scale-[1.03]"
                 />
                 <div
@@ -966,10 +914,10 @@ export default function ManishCinematicPage() {
                 {/* Left Column: Line-by-Line Reveal Headline & CTAs */}
                 <div className="lg:col-span-7 space-y-6">
                   <div className="space-y-1.5">
-                    <p className="mc-hero-line font-script text-2xl sm:text-3xl text-[#e10600]">
+                    <p className="mc-hero-line font-script text-2xl sm:text-3xl text-[#F3D27A]">
                       Dream • Shoot • Create
                     </p>
-                    <p className="mc-hero-line text-xs sm:text-sm font-medium tracking-[0.22em] text-neutral-300 uppercase">
+                    <p className="mc-hero-line text-xs sm:text-sm font-medium tracking-[0.22em] text-neutral-200 uppercase">
                       Short Film Maker | Cinematographer · Begusarai, Bihar
                     </p>
                   </div>
@@ -1037,7 +985,16 @@ export default function ManishCinematicPage() {
                       Email via Gmail
                     </a>
                     <span aria-hidden="true">·</span>
-                    <span className="text-white font-medium">Starting ₹15,000/-</span>
+                    <a
+                      href="https://manishcinematic.in"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label="Manish Cinematic official website ManishCinematic.in"
+                      className="text-[#F3D27A] hover:text-white inline-flex items-center gap-1.5 font-semibold transition-colors"
+                    >
+                      <Globe className="w-3.5 h-3.5 text-[#F3D27A]" />
+                      ManishCinematic.in
+                    </a>
                   </div>
                 </div>
 
@@ -1078,14 +1035,18 @@ export default function ManishCinematicPage() {
                           <ResilientImage
                             src={HERO_EQUIPMENT_ITEMS[0].imageUrl}
                             alt={HERO_EQUIPMENT_ITEMS[0].title}
+                            loading="eager"
+                            fetchPriority="high"
+                            width={640}
+                            height={360}
                             className="w-full aspect-[16/9] object-cover object-center group-hover:scale-105 transition-transform duration-700"
                           />
                           <div className="absolute inset-0 bg-gradient-to-t from-[#29050E]/90 via-transparent to-[#29050E]/25" />
                           <div className="absolute top-3.5 left-4 right-4 flex items-center justify-between text-[10px] font-semibold tracking-[0.2em] uppercase">
-                            <span className="text-white/90 bg-black/55 backdrop-blur-md px-2.5 py-1 rounded-md border border-white/15">
+                            <span className="text-white/95 bg-black/60 backdrop-blur-md px-2.5 py-1 rounded-md border border-white/15">
                               {HERO_EQUIPMENT_ITEMS[0].tag}
                             </span>
-                            <span className="text-[#e10600] bg-black/60 backdrop-blur-md px-2 py-1 rounded-md border border-[#e10600]/40">
+                            <span className="text-[#F3D27A] bg-black/65 backdrop-blur-md px-2 py-1 rounded-md border border-[#D4AF37]/45">
                               4K SUITE
                             </span>
                           </div>
@@ -1094,7 +1055,7 @@ export default function ManishCinematicPage() {
                               <span className="font-display italic font-bold text-sm sm:text-base text-white tracking-wide block leading-tight">
                                 {HERO_EQUIPMENT_ITEMS[0].title}
                               </span>
-                              <span className="text-[11px] text-neutral-300">
+                              <span className="text-[11px] text-neutral-200">
                                 In-House Color Grading & Sound Mastering
                               </span>
                             </div>
@@ -1137,6 +1098,9 @@ export default function ManishCinematicPage() {
                               <ResilientImage
                                 src={gear.imageUrl}
                                 alt={gear.title}
+                                loading="eager"
+                                width={320}
+                                height={400}
                                 className="w-full aspect-[4/5] object-cover object-center group-hover:scale-105 transition-transform duration-700"
                               />
                               <div className="absolute inset-0 bg-gradient-to-t from-[#29050E]/95 via-[#29050E]/15 to-transparent" />
@@ -1206,7 +1170,7 @@ export default function ManishCinematicPage() {
             <div className="max-w-7xl mx-auto px-5 sm:px-8 lg:px-12">
               <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
                 <div>
-                  <p className="font-script text-2xl text-[#e10600]">Behind Every Frame</p>
+                  <p className="font-script text-2xl text-[#F3D27A]">Behind Every Frame</p>
                   <h2
                     className="font-display font-black italic uppercase text-3xl sm:text-5xl text-white mt-1 tracking-tight"
                     style={{ textWrap: 'balance' }}
@@ -1215,7 +1179,7 @@ export default function ManishCinematicPage() {
                   </h2>
                 </div>
                 <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-                  <p className="text-xs sm:text-sm text-neutral-400 max-w-sm">
+                  <p className="text-xs sm:text-sm text-neutral-300 max-w-sm">
                     Sony Alpha 4K cinema bodies, Sigma f/2.8 optics, DJI Ronin gimbals, and 4K aerial drones ready for your shoot.
                   </p>
                   <button
@@ -1299,7 +1263,7 @@ export default function ManishCinematicPage() {
             <div className="max-w-7xl mx-auto px-5 sm:px-8 lg:px-12">
               <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
                 <div>
-                  <p className="font-script text-2xl text-[#e10600]">What We Craft</p>
+                  <p className="font-script text-2xl text-[#F3D27A]">What We Craft</p>
                   <h2
                     className="font-display font-black italic uppercase text-3xl sm:text-5xl text-white mt-1 tracking-tight"
                     style={{ textWrap: 'balance' }}
@@ -1307,7 +1271,7 @@ export default function ManishCinematicPage() {
                     Our Signature Services
                   </h2>
                 </div>
-                <p className="text-sm text-neutral-400 max-w-md">
+                <p className="text-sm text-neutral-300 max-w-md">
                   From grand Indian weddings in Begusarai to narrative short films, every shoot is directed with cinematic precision.
                 </p>
               </div>
@@ -1331,22 +1295,22 @@ export default function ManishCinematicPage() {
                     >
                       <div className="space-y-4">
                         <div className="flex items-center justify-between">
-                          <div className="w-12 h-12 rounded-xl bg-[#e10600]/15 border border-[#e10600]/40 text-[#e10600] flex items-center justify-center">
+                          <div className="w-12 h-12 rounded-xl bg-[#e10600]/15 border border-[#e10600]/40 text-[#F3D27A] flex items-center justify-center">
                             <Icon className="w-6 h-6" />
                           </div>
-                          <span className="font-display italic font-bold text-sm text-neutral-500 tabular-nums">
+                          <span className="font-display italic font-bold text-sm text-neutral-300 tabular-nums">
                             0{idx + 1}
                           </span>
                         </div>
                         <h3 className="font-display font-extrabold italic text-xl sm:text-2xl text-white">
                           {service.title}
                         </h3>
-                        <p className="text-xs sm:text-sm text-neutral-400 leading-relaxed">
+                        <p className="text-xs sm:text-sm text-neutral-300 leading-relaxed">
                           {service.description}
                         </p>
                       </div>
 
-                      <div className="pt-4 border-t border-white/10 flex items-center justify-between text-xs font-semibold text-[#e10600]">
+                      <div className="pt-4 border-t border-white/10 flex items-center justify-between text-xs font-semibold text-[#F3D27A]">
                         <span>Book This Service</span>
                         <ArrowRight className="w-4 h-4" />
                       </div>
@@ -1387,12 +1351,12 @@ export default function ManishCinematicPage() {
             <div className="max-w-7xl mx-auto px-5 sm:px-8 lg:px-12 mb-10">
               <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
                 <div>
-                  <p className="font-script text-2xl text-[#e10600]">From Vision to Cinema</p>
+                  <p className="font-script text-2xl text-[#F3D27A]">From Vision to Cinema</p>
                   <h2 className="font-display font-black italic uppercase text-3xl sm:text-5xl text-white mt-1">
                     Our Process
                   </h2>
                 </div>
-                <p className="text-xs sm:text-sm text-neutral-400">
+                <p className="text-xs sm:text-sm text-neutral-300">
                   Enquiry → Planning → Shoot → Editing → Delivery
                 </p>
               </div>
@@ -1411,28 +1375,28 @@ export default function ManishCinematicPage() {
                   >
                     <div>
                       <div className="flex items-center justify-between mb-5">
-                        <span className="font-display font-black italic text-4xl text-[#e10600] tabular-nums">
+                        <span className="font-display font-black italic text-4xl text-[#F3D27A] tabular-nums">
                           {step.num}
                         </span>
-                        <span className="text-xs text-neutral-400 tracking-wide">
+                        <span className="text-xs text-neutral-300 tracking-wide">
                           {step.subtitle}
                         </span>
                       </div>
                       <h3 className="font-display font-extrabold italic uppercase text-2xl text-white">
                         {step.title}
                       </h3>
-                      <p className="text-sm text-neutral-400 mt-3 leading-relaxed">{step.desc}</p>
+                      <p className="text-sm text-neutral-300 mt-3 leading-relaxed">{step.desc}</p>
                     </div>
 
-                    <div className="pt-5 mt-6 border-t border-white/10 flex items-center justify-between text-xs text-neutral-500">
+                    <div className="pt-5 mt-6 border-t border-white/10 flex items-center justify-between text-xs text-neutral-300">
                       <span>Stage {i + 1} of 5</span>
                       {i < PROCESS_STEPS.length - 1 ? (
-                        <span className="text-[#e10600] inline-flex items-center gap-1 font-medium">
+                        <span className="text-[#F3D27A] inline-flex items-center gap-1 font-medium">
                           Next: {PROCESS_STEPS[i + 1].title}
                           <ArrowRight className="w-3.5 h-3.5" />
                         </span>
                       ) : (
-                        <span className="text-emerald-400 font-medium">Ready to Relive Forever</span>
+                        <span className="text-emerald-300 font-medium">Ready to Relive Forever</span>
                       )}
                     </div>
                   </div>
@@ -1451,7 +1415,7 @@ export default function ManishCinematicPage() {
             <div className="max-w-7xl mx-auto px-5 sm:px-8 lg:px-12">
               <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 mb-10">
                 <div>
-                  <p className="font-script text-2xl text-[#e10600]">Selected Frames</p>
+                  <p className="font-script text-2xl text-[#F3D27A]">Selected Frames</p>
                   <h2 className="font-display font-black italic uppercase text-3xl sm:text-5xl text-white mt-1">
                     Visual Gallery
                   </h2>
@@ -1483,13 +1447,13 @@ export default function ManishCinematicPage() {
                         className={`px-3.5 py-2 rounded-lg text-xs font-semibold transition-colors whitespace-nowrap inline-flex items-center gap-1.5 ${
                           galleryFilter === cat
                             ? 'bg-[#e10600] text-white'
-                            : 'text-neutral-400 hover:text-white'
+                            : 'text-neutral-300 hover:text-white'
                         }`}
                       >
                         <span>{cat}</span>
                         <span
                           className={`text-[10px] tabular-nums ${
-                            galleryFilter === cat ? 'text-white/80' : 'text-neutral-500'
+                            galleryFilter === cat ? 'text-white/90' : 'text-neutral-300'
                           }`}
                         >
                           {count}
@@ -1500,7 +1464,7 @@ export default function ManishCinematicPage() {
                 </div>
               </div>
 
-              <p className="text-xs sm:text-sm text-neutral-400 mb-7">
+              <p className="text-xs sm:text-sm text-neutral-300 mb-7">
                 100% real camera captures by Manish Cinematic. Click any photograph to explore full-frame lighting and resolution in the viewer.
               </p>
 
@@ -1527,17 +1491,19 @@ export default function ManishCinematicPage() {
                     <ResilientImage
                       src={item.imageUrl}
                       alt={`${item.title} — Manish Cinematic ${item.category}`}
+                      width={480}
+                      height={640}
                       className="w-full aspect-[3/4] object-cover object-top group-hover:scale-105 transition-transform duration-500"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/20 to-transparent opacity-85 group-hover:opacity-100 transition-opacity" />
                     <div className="absolute bottom-4 left-4 right-4">
-                      <div className="text-[11px] text-[#e10600] font-semibold uppercase tracking-wider">
-                        {item.category} · <span className="text-neutral-300">{item.location}</span>
+                      <div className="text-[11px] text-[#F3D27A] font-semibold uppercase tracking-wider">
+                        {item.category} · <span className="text-neutral-200">{item.location}</span>
                       </div>
                       <h3 className="font-display font-bold italic text-base sm:text-lg text-white mt-0.5 leading-snug">
                         {item.title}
                       </h3>
-                      <p className="text-[11px] text-neutral-400 mt-1 line-clamp-1">
+                      <p className="text-[11px] text-neutral-300 mt-1 line-clamp-1">
                         {item.exifMeta}
                       </p>
                     </div>
@@ -1551,7 +1517,7 @@ export default function ManishCinematicPage() {
           <section id="showreel" className="py-20 lg:py-24 border-b border-white/10 bg-[#320611]">
             <div className="max-w-7xl mx-auto px-5 sm:px-8 lg:px-12">
               <div className="text-center max-w-2xl mx-auto mb-10">
-                <p className="font-script text-2xl text-[#e10600]">Watch Us In Motion</p>
+                <p className="font-script text-2xl text-[#F3D27A]">Watch Us In Motion</p>
                 <h2 className="font-display font-black italic uppercase text-3xl sm:text-5xl text-white mt-1">
                   Official Cinema Showreels
                 </h2>
@@ -1668,7 +1634,7 @@ export default function ManishCinematicPage() {
             <div className="max-w-7xl mx-auto px-5 sm:px-8 lg:px-12">
               <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 mb-10">
                 <div>
-                  <p className="font-script text-2xl text-[#e10600]">Lock Your Wedding Date</p>
+                  <p className="font-script text-2xl text-[#F3D27A]">Lock Your Wedding Date</p>
                   <h2 className="font-display font-black italic uppercase text-3xl sm:text-5xl text-white mt-1">
                     Book Your Shoot
                   </h2>
@@ -1682,7 +1648,7 @@ export default function ManishCinematicPage() {
                     className={`px-4 py-2 rounded-lg text-xs font-semibold transition-colors whitespace-nowrap ${
                       bookingMode === 'quick'
                         ? 'bg-[#e10600] text-white'
-                        : 'text-neutral-400 hover:text-white'
+                        : 'text-neutral-300 hover:text-white'
                     }`}
                   >
                     Quick Booking Form
@@ -1693,7 +1659,7 @@ export default function ManishCinematicPage() {
                     className={`px-4 py-2 rounded-lg text-xs font-semibold transition-colors whitespace-nowrap ${
                       bookingMode === 'wizard'
                         ? 'bg-[#e10600] text-white'
-                        : 'text-neutral-400 hover:text-white'
+                        : 'text-neutral-300 hover:text-white'
                     }`}
                   >
                     8-Step Package & Razorpay Advance
@@ -1712,26 +1678,48 @@ export default function ManishCinematicPage() {
                     void fetchCatalog();
                   }}
                 />
+              ) : services.length > 0 ? (
+                <BookingWizard
+                  key={wizardKey}
+                  services={services}
+                  packages={packages}
+                  addons={addons}
+                  availabilitySlots={availabilitySlots}
+                  initialServiceSlug={wizardServiceSlug}
+                  onBookingConfirmed={(newBooking, newPayment) => {
+                    setRecentLocalBookings((prev) => [newBooking, ...prev]);
+                    setRecentLocalPayments((prev) => [newPayment, ...prev]);
+                    void fetchCatalog();
+                  }}
+                  onOpenCustomerPortal={() => {
+                    setActiveView('portal');
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                  }}
+                />
               ) : (
-                services.length > 0 && (
-                  <BookingWizard
-                    key={wizardKey}
-                    services={services}
-                    packages={packages}
-                    addons={addons}
-                    availabilitySlots={availabilitySlots}
-                    initialServiceSlug={wizardServiceSlug}
-                    onBookingConfirmed={(newBooking, newPayment) => {
-                      setRecentLocalBookings((prev) => [newBooking, ...prev]);
-                      setRecentLocalPayments((prev) => [newPayment, ...prev]);
-                      void fetchCatalog();
-                    }}
-                    onOpenCustomerPortal={() => {
-                      setActiveView('portal');
-                      window.scrollTo({ top: 0, behavior: 'smooth' });
-                    }}
-                  />
-                )
+                <div className="rounded-2xl border border-[#D4AF37]/30 bg-[#29050E] p-8 text-center space-y-4">
+                  <p className="text-sm text-neutral-200">
+                    Use the instant Quick Booking Form or WhatsApp to lock your wedding or reel shoot date with ₹2,000 advance.
+                  </p>
+                  <div className="flex flex-wrap items-center justify-center gap-3">
+                    <button
+                      type="button"
+                      onClick={() => setBookingMode('quick')}
+                      className="px-5 py-2.5 rounded-xl bg-[#e10600] hover:bg-[#c50500] text-white text-xs font-semibold transition-colors"
+                    >
+                      Open Quick Booking Form
+                    </button>
+                    <a
+                      href={whatsappHeroUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="px-5 py-2.5 rounded-xl bg-[#25D366] hover:bg-[#1ebe5d] text-white text-xs font-semibold inline-flex items-center gap-1.5 transition-colors"
+                    >
+                      <MessageCircle className="w-4 h-4" />
+                      Book on WhatsApp
+                    </a>
+                  </div>
+                </div>
               )}
             </div>
           </section>
@@ -1751,7 +1739,7 @@ export default function ManishCinematicPage() {
           <section id="contact" className="py-20 lg:py-24 border-b border-white/10">
             <div className="max-w-7xl mx-auto px-5 sm:px-8 lg:px-12">
               <div className="mb-12">
-                <p className="font-script text-2xl text-[#e10600]">Visit Our Studio</p>
+                <p className="font-script text-2xl text-[#F3D27A]">Visit Our Studio</p>
                 <h2 className="font-display font-black italic uppercase text-3xl sm:text-5xl text-white mt-1">
                   Contact Manish Cinematic
                 </h2>
@@ -1762,7 +1750,7 @@ export default function ManishCinematicPage() {
                 <div className="lg:col-span-5 p-7 sm:p-8 rounded-2xl border border-white/10 bg-[#29050E] flex flex-col justify-between space-y-6">
                   <div className="space-y-6">
                     <div>
-                      <p className="text-xs uppercase tracking-widest text-[#e10600] font-semibold">
+                      <p className="text-xs uppercase tracking-widest text-[#F3D27A] font-semibold">
                         Studio Address
                       </p>
                       <a
@@ -1770,14 +1758,26 @@ export default function ManishCinematicPage() {
                         target="_blank"
                         rel="noopener noreferrer"
                         aria-label="Open Manish Cinematic studio location in Google Maps"
-                        className="text-lg font-semibold text-white hover:text-[#e10600] mt-1.5 inline-flex items-start gap-2.5 transition-colors"
+                        className="text-lg font-semibold text-white hover:text-[#F3D27A] mt-1.5 inline-flex items-start gap-2.5 transition-colors"
                       >
-                        <MapPin className="w-5 h-5 text-[#e10600] shrink-0 mt-0.5" />
+                        <MapPin className="w-5 h-5 text-[#F3D27A] shrink-0 mt-0.5" />
                         <span>Ayodhya Chowk Tegra, Begusarai, Bihar</span>
                       </a>
                       <p className="text-xs text-neutral-400 mt-1 pl-7">
-                        Open Daily: 9:00 AM – 9:00 PM · Available Across Bihar & All India
+                        Open Daily: 9:00 AM – 9:00 PM · Available Across Bihar &amp; All India
                       </p>
+                      <div className="mt-3 pl-7">
+                        <a
+                          href="https://manishcinematic.in"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#F3D27A] hover:text-white transition-colors"
+                        >
+                          <Globe className="w-3.5 h-3.5" />
+                          <span>ManishCinematic.in</span>
+                          <ExternalLink className="w-3 h-3 opacity-80" />
+                        </a>
+                      </div>
                     </div>
 
                     <div className="space-y-3">
@@ -1911,16 +1911,25 @@ export default function ManishCinematicPage() {
         <div className="max-w-7xl mx-auto px-5 sm:px-8 lg:px-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10">
           <div className="space-y-3">
             <ManishLogo />
-            <p className="font-script text-xl text-[#e10600] pt-1">Dream • Shoot • Create</p>
+            <p className="font-script text-xl text-[#F3D27A] pt-1">Dream • Shoot • Create</p>
             <p className="leading-relaxed">
-              Short Film Maker | Cinematographer — Wedding photography, pre-wedding shoots, and cinematic wedding films in Begusarai, Bihar.
+              <strong className="text-white font-semibold">Manish Cinematic</strong> — Short Film Maker &amp; Cinematographer for wedding photography, pre-wedding shoots, 4K wedding films &amp; reels across Begusarai and Bihar.
             </p>
+            <a
+              href="https://manishcinematic.in"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#F3D27A] hover:text-white transition-colors pt-0.5"
+            >
+              <Globe className="w-3.5 h-3.5" />
+              ManishCinematic.in
+            </a>
           </div>
 
           <div>
-            <h4 className="font-display font-bold italic uppercase text-sm text-white mb-4">
+            <h3 className="font-display font-bold italic uppercase text-sm text-white mb-4">
               Quick Links
-            </h4>
+            </h3>
             <ul className="space-y-2.5">
               {[
                 { label: 'Home', id: 'home' },
@@ -1934,7 +1943,7 @@ export default function ManishCinematicPage() {
                   <button
                     type="button"
                     onClick={() => scrollToSection(link.id)}
-                    className="hover:text-[#e10600] transition-colors"
+                    className="hover:text-[#F3D27A] transition-colors"
                   >
                     {link.label}
                   </button>
@@ -1944,9 +1953,9 @@ export default function ManishCinematicPage() {
           </div>
 
           <div>
-            <h4 className="font-display font-bold italic uppercase text-sm text-white mb-4">
+            <h3 className="font-display font-bold italic uppercase text-sm text-white mb-4">
               Studio Portal & Tools
-            </h4>
+            </h3>
             <ul className="space-y-2.5">
               <li>
                 <button
@@ -1955,9 +1964,9 @@ export default function ManishCinematicPage() {
                     setActiveView('portal');
                     window.scrollTo({ top: 0, behavior: 'smooth' });
                   }}
-                  className="inline-flex items-center gap-1.5 hover:text-[#e10600] transition-colors"
+                  className="inline-flex items-center gap-1.5 hover:text-[#F3D27A] transition-colors"
                 >
-                  <UserCheck className="w-3.5 h-3.5 text-[#e10600]" />
+                  <UserCheck className="w-3.5 h-3.5 text-[#F3D27A]" />
                   Client Account & Receipts
                 </button>
               </li>
@@ -1965,9 +1974,9 @@ export default function ManishCinematicPage() {
                 <a
                   href="tel:+918210057153"
                   aria-label="Call Manish Cinematic"
-                  className="hover:text-[#e10600] transition-colors inline-flex items-center gap-1.5"
+                  className="hover:text-[#F3D27A] transition-colors inline-flex items-center gap-1.5"
                 >
-                  <Phone className="w-3.5 h-3.5 text-[#e10600]" />
+                  <Phone className="w-3.5 h-3.5 text-[#F3D27A]" />
                   Call Studio
                 </a>
               </li>
@@ -1977,9 +1986,9 @@ export default function ManishCinematicPage() {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label="Send email to Manish Cinematic via Gmail"
-                  className="hover:text-[#e10600] transition-colors inline-flex items-center gap-1.5"
+                  className="hover:text-[#F3D27A] transition-colors inline-flex items-center gap-1.5"
                 >
-                  <Mail className="w-3.5 h-3.5 text-[#e10600]" />
+                  <Mail className="w-3.5 h-3.5 text-[#F3D27A]" />
                   Send Email (Gmail)
                 </a>
               </li>
@@ -1988,7 +1997,7 @@ export default function ManishCinematicPage() {
                   href={SOCIAL_LINKS.googleMaps}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="hover:text-[#e10600] transition-colors inline-flex items-center gap-1"
+                  className="hover:text-[#F3D27A] transition-colors inline-flex items-center gap-1"
                 >
                   Ayodhya Chowk Tegra, Begusarai
                   <ExternalLink className="w-3 h-3" />
@@ -1998,9 +2007,9 @@ export default function ManishCinematicPage() {
           </div>
 
           <div>
-            <h4 className="font-display font-bold italic uppercase text-sm text-white mb-4">
+            <h3 className="font-display font-bold italic uppercase text-sm text-white mb-4">
               Connect With Us
-            </h4>
+            </h3>
             <div className="flex flex-wrap items-center gap-2.5">
               <a
                 href={SOCIAL_LINKS.youtube}
@@ -2084,7 +2093,18 @@ export default function ManishCinematicPage() {
         </div>
 
         <div className="max-w-7xl mx-auto px-5 sm:px-8 lg:px-12 mt-6 pt-6 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p className="text-neutral-300 font-medium">© Manish Cinematic. All Rights Reserved.</p>
+          <p className="text-neutral-300 font-medium">
+            © Manish Cinematic ·{' '}
+            <a
+              href="https://manishcinematic.in"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-[#F3D27A] hover:text-white transition-colors"
+            >
+              ManishCinematic.in
+            </a>
+            . All Rights Reserved.
+          </p>
           <a
             href={SOCIAL_LINKS.googleMaps}
             target="_blank"

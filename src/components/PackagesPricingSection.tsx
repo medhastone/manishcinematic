@@ -724,6 +724,7 @@ export function PackagesPricingSection({ onCheckAvailability }: PackagesPricingS
 
             {/* Live Countdown Digits */}
             <div
+              role="timer"
               aria-label="Festive offer countdown timer"
               className="flex items-center gap-1.5 sm:gap-2 tabular-nums"
             >
@@ -751,8 +752,8 @@ export function PackagesPricingSection({ onCheckAvailability }: PackagesPricingS
 
         {/* 2. SECTION HEADLINE & PREFERRED EVENT DATE PICKER */}
         <div className="text-center max-w-3xl mx-auto mb-10 space-y-3">
-          <p className="text-xs sm:text-sm font-semibold uppercase tracking-[0.24em] text-[#F3D27A]">
-            Transparent Packages & Pricing · Bihar&apos;s Trusted Cinema Team
+          <p className="text-xs sm:text-sm font-semibold uppercase tracking-[0.22em] text-[#F3D27A]">
+            Manish Cinematic · ManishCinematic.in · Bihar&apos;s Trusted Cinema Team
           </p>
           <h2
             id="pricing-section-heading"
@@ -1292,19 +1293,23 @@ export function PackagesPricingSection({ onCheckAvailability }: PackagesPricingS
                       </p>
                       <p className="text-xs sm:text-sm text-white/75">{activeTestimonial.town}</p>
                     </div>
-                    <div className="flex items-center gap-1.5">
+                    <div className="flex items-center gap-1">
                       {HINDI_TESTIMONIALS.map((item, idx) => (
                         <button
                           key={item.id}
                           type="button"
                           aria-label={`View testimonial ${idx + 1}`}
                           onClick={() => setTestimonialIdx(idx)}
-                          className={`h-2 rounded-full transition-all cursor-pointer ${
-                            idx === testimonialIdx
-                              ? 'w-7 bg-[#D4AF37]'
-                              : 'w-2 bg-white/30 hover:bg-white/60'
-                          }`}
-                        />
+                          className="min-h-[36px] min-w-[28px] flex items-center justify-center cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37] rounded-md"
+                        >
+                          <span
+                            className={`h-2 rounded-full transition-all ${
+                              idx === testimonialIdx
+                                ? 'w-7 bg-[#D4AF37]'
+                                : 'w-2 bg-white/40 hover:bg-white/75'
+                            }`}
+                          />
+                        </button>
                       ))}
                     </div>
                   </div>

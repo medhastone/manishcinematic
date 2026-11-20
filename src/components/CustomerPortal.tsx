@@ -38,7 +38,12 @@ export function CustomerPortal({
     signOut,
     getFreshToken,
     updateProfile,
+    ensureAuthInitialized,
   } = useAuth();
+
+  useEffect(() => {
+    void ensureAuthInitialized();
+  }, [ensureAuthInitialized]);
 
   const [bookings, setBookings] = useState<StudioBooking[]>([]);
   const [payments, setPayments] = useState<StudioPayment[]>([]);

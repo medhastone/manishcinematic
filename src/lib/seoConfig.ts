@@ -1,5 +1,7 @@
 import type { Metadata } from 'next';
 
+export const BRAND_NAME = 'Manish Cinematic';
+export const DOMAIN_DISPLAY = 'ManishCinematic.in';
 export const SITE_URL = (process.env.APP_URL || 'https://manishcinematic.in').replace(/\/+$/, '');
 export const PRIMARY_OG_IMAGE = '/assets/cinema_hero_backdrop_1795170914610.jpg';
 export const STUDIO_OG_IMAGE = '/assets/aistudio/2026-11-19_14.43.52_c4eb0004.jpg';
@@ -60,7 +62,9 @@ export const LOCAL_SEO_KEYWORDS = [
   '4K video editing studio Begusarai',
   // Hyper-Local Bihar Cities & Brand
   'Manish Cinematic',
+  'ManishCinematic.in',
   'Manish Cinematic Begusarai',
+  'Manish Cinematic Bihar',
   'Ayodhya Chowk Teghra photographer',
   'photographer in Teghra Begusarai',
   'photographer in Barauni',
@@ -280,8 +284,9 @@ export function buildStructuredDataGraph() {
         '@type': 'WebSite',
         '@id': `${SITE_URL}/#website`,
         url: SITE_URL,
-        name: 'Manish Cinematic',
+        name: BRAND_NAME,
         alternateName: [
+          DOMAIN_DISPLAY,
           'Manish Cinematic Begusarai',
           'Manish Cinematic Bihar',
           'manishcinematic video and photo photographer',
@@ -296,8 +301,8 @@ export function buildStructuredDataGraph() {
       {
         '@type': ['LocalBusiness', 'ProfessionalService'],
         '@id': `${SITE_URL}/#localbusiness`,
-        name: 'Manish Cinematic',
-        alternateName: 'manishcinematic video and photo photographer',
+        name: BRAND_NAME,
+        alternateName: [DOMAIN_DISPLAY, 'manishcinematic video and photo photographer'],
         url: SITE_URL,
         logo: {
           '@type': 'ImageObject',
