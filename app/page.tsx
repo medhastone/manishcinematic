@@ -56,12 +56,28 @@ const STUDIO_STATS = [
   { id: 'films', label: 'Short Films', target: 20, suffix: '+' },
 ];
 
-const SHOWREEL_YOUTUBE_WATCH_URL =
-  'https://youtu.be/BM6FN6dRmf0?si=OLfhfSy70yNT-6JC';
-const SHOWREEL_YOUTUBE_EMBED_URL =
-  'https://www.youtube.com/embed/BM6FN6dRmf0?autoplay=1&rel=0&modestbranding=1';
-const SHOWREEL_YOUTUBE_THUMB_HD = 'https://i.ytimg.com/vi/BM6FN6dRmf0/maxresdefault.jpg';
-const SHOWREEL_YOUTUBE_THUMB_HQ = 'https://i.ytimg.com/vi/BM6FN6dRmf0/hqdefault.jpg';
+const FEATURED_SHOWREEL_VIDEOS = [
+  {
+    id: 'BM6FN6dRmf0',
+    badge: 'Showreel 01',
+    title: 'Official Cinema Showreel',
+    subtitle: 'Wedding Films, Drone Aerials & Short Films · Begusarai, Bihar',
+    watchUrl: 'https://youtu.be/BM6FN6dRmf0?si=OLfhfSy70yNT-6JC',
+    embedUrl: 'https://www.youtube.com/embed/BM6FN6dRmf0?autoplay=1&rel=0&modestbranding=1',
+    thumbHd: 'https://i.ytimg.com/vi/BM6FN6dRmf0/maxresdefault.jpg',
+    thumbHq: 'https://i.ytimg.com/vi/BM6FN6dRmf0/hqdefault.jpg',
+  },
+  {
+    id: 'VlQy8cF7_wk',
+    badge: 'Featured Film 02',
+    title: 'Cinematic Wedding & Shoot Preview',
+    subtitle: 'Directed, Shot & Color-Graded by Manish Cinematic · Bihar',
+    watchUrl: 'https://youtu.be/VlQy8cF7_wk?si=bw4NAYLKpi5SLL2w',
+    embedUrl: 'https://www.youtube.com/embed/VlQy8cF7_wk?autoplay=1&rel=0&modestbranding=1',
+    thumbHd: 'https://i.ytimg.com/vi/VlQy8cF7_wk/maxresdefault.jpg',
+    thumbHq: 'https://i.ytimg.com/vi/VlQy8cF7_wk/hqdefault.jpg',
+  },
+] as const;
 
 const SOCIAL_LINKS = {
   youtube: 'https://youtube.com/@biharmanishcinematic?si=9g4A5srHKq-bBkTA',
@@ -419,9 +435,9 @@ export default function ManishCinematicPage() {
   const [lightboxSource, setLightboxSource] = useState<'gallery' | 'equipment'>('gallery');
   const [lightboxIdx, setLightboxIdx] = useState<number | null>(null);
 
-  // Showreel modal & thumbnail state
-  const [showreelOpen, setShowreelOpen] = useState(false);
-  const [showreelThumbUrl, setShowreelThumbUrl] = useState(SHOWREEL_YOUTUBE_THUMB_HD);
+  // Showreel modal & per-video thumbnail fallback state
+  const [activeShowreelIdx, setActiveShowreelIdx] = useState<number | null>(null);
+  const [fallbackThumbIds, setFallbackThumbIds] = useState<Record<string, boolean>>({});
 
   // Booking mode toggle (Quick Mobile Form vs Full 8-Step Razorpay Wizard)
   const [bookingMode, setBookingMode] = useState<'quick' | 'wizard'>('quick');
@@ -542,7 +558,7 @@ export default function ManishCinematicPage() {
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
         setLightboxIdx(null);
-        setShowreelOpen(false);
+        setActiveShowreelIdx(null);
       } else if (e.key === 'ArrowRight' && lightboxIdx !== null) {
         setLightboxIdx((prev) => (prev === null ? null : (prev + 1) % lightboxItems.length));
       } else if (e.key === 'ArrowLeft' && lightboxIdx !== null) {
@@ -1531,84 +1547,116 @@ export default function ManishCinematicPage() {
             </div>
           </section>
 
-          {/* 8. SHOWREEL VIDEO SECTION WITH CUSTOM PLAY BUTTON MODAL */}
+          {/* 8. SHOWREEL & FEATURED YOUTUBE VIDEO PREVIEWS WITH MODAL PLAYER */}
           <section id="showreel" className="py-20 lg:py-24 border-b border-white/10 bg-[#320611]">
-            <div className="max-w-6xl mx-auto px-5 sm:px-8 lg:px-12">
+            <div className="max-w-7xl mx-auto px-5 sm:px-8 lg:px-12">
               <div className="text-center max-w-2xl mx-auto mb-10">
                 <p className="font-script text-2xl text-[#e10600]">Watch Us In Motion</p>
                 <h2 className="font-display font-black italic uppercase text-3xl sm:text-5xl text-white mt-1">
-                  Official Cinema Showreel
+                  Official Cinema Showreels
                 </h2>
+                <p className="text-sm text-neutral-300 mt-2.5">
+                  Preview our real wedding films, reels &amp; cinematic direction directly from YouTube.
+                </p>
               </div>
 
-              <div
-                onClick={() => setShowreelOpen(true)}
-                role="button"
-                tabIndex={0}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    setShowreelOpen(true);
-                  }
-                }}
-                aria-label="Play Manish Cinematic Official Showreel"
-                className="group relative aspect-video w-full rounded-3xl overflow-hidden border border-white/15 bg-[#090909] cursor-pointer shadow-2xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e10600]"
-              >
-                {/* Live YouTube Video Preview Thumbnail */}
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={showreelThumbUrl}
-                  alt="Manish Cinematic Official Cinema Showreel Video Preview"
-                  referrerPolicy="no-referrer"
-                  onLoad={(e) => {
-                    if (
-                      showreelThumbUrl === SHOWREEL_YOUTUBE_THUMB_HD &&
-                      e.currentTarget.naturalWidth <= 120
-                    ) {
-                      setShowreelThumbUrl(SHOWREEL_YOUTUBE_THUMB_HQ);
-                    }
-                  }}
-                  onError={() => {
-                    if (showreelThumbUrl !== SHOWREEL_YOUTUBE_THUMB_HQ) {
-                      setShowreelThumbUrl(SHOWREEL_YOUTUBE_THUMB_HQ);
-                    }
-                  }}
-                  className="w-full h-full object-cover opacity-80 group-hover:scale-105 transition-transform duration-700"
-                />
-                <div className="film-strip-band absolute top-0 left-0 right-0 h-3 opacity-65 pointer-events-none" />
-                <div className="film-strip-band absolute bottom-0 left-0 right-0 h-3 opacity-65 pointer-events-none" />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#29050E]/90 via-[#29050E]/35 to-[#29050E]/30 flex flex-col items-center justify-center p-6 text-center">
-                  <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-[#e10600] text-white flex items-center justify-center shadow-[0_0_50px_rgba(225,6,0,0.65)] group-hover:scale-110 transition-transform">
-                    <Play className="w-9 h-9 fill-white translate-x-0.5" />
-                  </div>
-                  <p className="font-display font-extrabold italic uppercase text-xl sm:text-3xl text-white mt-6 tracking-wide drop-shadow">
-                    Play Official Cinema Showreel
-                  </p>
-                  <p className="text-xs sm:text-sm text-neutral-200 mt-1.5">
-                    Directed & Shot by Manish Cinematic · Begusarai, Bihar
-                  </p>
-                </div>
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
+                {FEATURED_SHOWREEL_VIDEOS.map((video, idx) => {
+                  const thumbSrc = fallbackThumbIds[video.id] ? video.thumbHq : video.thumbHd;
+                  return (
+                    <div key={video.id} className="space-y-3.5">
+                      <div
+                        onClick={() => setActiveShowreelIdx(idx)}
+                        role="button"
+                        tabIndex={0}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            setActiveShowreelIdx(idx);
+                          }
+                        }}
+                        aria-label={`Play ${video.title}`}
+                        className="group relative aspect-video w-full rounded-3xl overflow-hidden border border-[#D4AF37]/30 hover:border-[#e10600]/80 bg-[#1B050B] cursor-pointer shadow-2xl transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e10600]"
+                      >
+                        {/* Live YouTube Video Preview Thumbnail */}
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={thumbSrc}
+                          alt={`${video.title} — Manish Cinematic YouTube Preview`}
+                          loading="lazy"
+                          referrerPolicy="no-referrer"
+                          onLoad={(e) => {
+                            if (
+                              !fallbackThumbIds[video.id] &&
+                              e.currentTarget.naturalWidth <= 120
+                            ) {
+                              setFallbackThumbIds((prev) => ({ ...prev, [video.id]: true }));
+                            }
+                          }}
+                          onError={() => {
+                            if (!fallbackThumbIds[video.id]) {
+                              setFallbackThumbIds((prev) => ({ ...prev, [video.id]: true }));
+                            }
+                          }}
+                          className="w-full h-full object-cover opacity-85 group-hover:scale-105 transition-transform duration-700"
+                        />
+                        <div className="film-strip-band absolute top-0 left-0 right-0 h-3 opacity-65 pointer-events-none" />
+                        <div className="film-strip-band absolute bottom-0 left-0 right-0 h-3 opacity-65 pointer-events-none" />
+
+                        <div className="absolute top-4 left-4 z-10">
+                          <span className="inline-flex items-center gap-1.5 rounded-md bg-black/65 backdrop-blur-md border border-[#D4AF37]/40 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-[#F3D27A]">
+                            <Youtube className="w-3.5 h-3.5 text-[#e10600]" />
+                            {video.badge}
+                          </span>
+                        </div>
+
+                        <div className="absolute inset-0 bg-gradient-to-t from-[#29050E]/95 via-[#29050E]/35 to-[#29050E]/20 flex flex-col items-center justify-center p-6 text-center">
+                          <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-[#e10600] text-white flex items-center justify-center shadow-[0_0_45px_rgba(225,6,0,0.65)] group-hover:scale-110 transition-transform">
+                            <Play className="w-7 h-7 sm:w-8 sm:h-8 fill-white translate-x-0.5" />
+                          </div>
+                          <p className="font-display font-extrabold italic uppercase text-lg sm:text-2xl text-white mt-5 tracking-wide drop-shadow">
+                            {video.title}
+                          </p>
+                          <p className="text-xs sm:text-sm text-neutral-200 mt-1">
+                            {video.subtitle}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center justify-between gap-3 px-1">
+                        <button
+                          type="button"
+                          onClick={() => setActiveShowreelIdx(idx)}
+                          className="text-xs font-semibold text-[#F3D27A] hover:text-white inline-flex items-center gap-1.5 transition-colors cursor-pointer"
+                        >
+                          <Play className="w-3.5 h-3.5 fill-current" />
+                          Play Preview Here
+                        </button>
+                        <a
+                          href={video.watchUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-xs font-semibold text-neutral-200 hover:text-[#e10600] inline-flex items-center gap-1.5 transition-colors"
+                        >
+                          <Youtube className="w-3.5 h-3.5 text-[#e10600]" />
+                          Open on YouTube
+                          <ExternalLink className="w-3 h-3 opacity-80" />
+                        </a>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
 
-              <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
-                <a
-                  href={SHOWREEL_YOUTUBE_WATCH_URL}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="px-6 py-3 rounded-xl bg-[#e10600] hover:bg-[#c50500] text-white text-xs sm:text-sm font-semibold inline-flex items-center gap-2.5 transition-colors"
-                >
-                  <Youtube className="w-4 h-4" />
-                  Open Showreel on YouTube
-                  <ExternalLink className="w-3.5 h-3.5 opacity-80" />
-                </a>
+              <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
                 <a
                   href={SOCIAL_LINKS.youtube}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="px-6 py-3 rounded-xl border border-white/15 bg-white/5 hover:border-[#e10600] hover:bg-[#e10600]/10 text-white text-xs sm:text-sm font-semibold inline-flex items-center gap-2.5 transition-colors"
+                  className="px-6 py-3 rounded-xl bg-[#e10600] hover:bg-[#c50500] text-white text-xs sm:text-sm font-semibold inline-flex items-center gap-2.5 transition-colors shadow-lg"
                 >
-                  <Youtube className="w-4 h-4 text-[#e10600]" />
-                  Visit Channel (@biharmanishcinematic)
+                  <Youtube className="w-4 h-4" />
+                  Visit Full YouTube Channel (@biharmanishcinematic)
                   <ExternalLink className="w-3.5 h-3.5 opacity-80" />
                 </a>
               </div>
@@ -2148,24 +2196,41 @@ export default function ManishCinematicPage() {
       )}
 
       {/* SHOWREEL YOUTUBE VIDEO MODAL */}
-      {showreelOpen && (
+      {activeShowreelIdx !== null && FEATURED_SHOWREEL_VIDEOS[activeShowreelIdx] && (
         <div
           role="dialog"
           aria-modal="true"
-          aria-label="Manish Cinematic Showreel Video"
+          aria-label={FEATURED_SHOWREEL_VIDEOS[activeShowreelIdx].title}
           className="fixed inset-0 z-[80] bg-black/95 backdrop-blur-md flex items-center justify-center p-4 sm:p-8"
         >
-          <div className="relative max-w-5xl w-full rounded-2xl border border-white/15 bg-[#29050E] overflow-hidden">
-            <div className="flex items-center justify-between px-5 py-3.5 border-b border-white/10">
-              <div className="flex items-center gap-3">
+          <div className="relative max-w-5xl w-full rounded-2xl border border-[#D4AF37]/35 bg-[#29050E] overflow-hidden shadow-2xl">
+            <div className="flex flex-wrap items-center justify-between gap-3 px-5 py-3.5 border-b border-white/10">
+              <div className="flex items-center gap-3 min-w-0">
                 <ManishLogo compact />
-                <span className="text-xs text-neutral-400 hidden sm:inline">
-                  Official Wedding & Short Film Showreel
+                <span className="text-xs text-neutral-300 truncate hidden sm:inline">
+                  {FEATURED_SHOWREEL_VIDEOS[activeShowreelIdx].title}
                 </span>
               </div>
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2 sm:gap-3">
+                {/* Quick Switch Between Both Videos */}
+                <div className="inline-flex items-center rounded-lg border border-white/15 bg-[#22040B] p-0.5 text-[11px]">
+                  {FEATURED_SHOWREEL_VIDEOS.map((vid, idx) => (
+                    <button
+                      key={vid.id}
+                      type="button"
+                      onClick={() => setActiveShowreelIdx(idx)}
+                      className={`px-2.5 py-1 rounded-md font-semibold transition-colors cursor-pointer ${
+                        activeShowreelIdx === idx
+                          ? 'bg-[#e10600] text-white'
+                          : 'text-neutral-300 hover:text-white'
+                      }`}
+                    >
+                      Video {idx + 1}
+                    </button>
+                  ))}
+                </div>
                 <a
-                  href={SHOWREEL_YOUTUBE_WATCH_URL}
+                  href={FEATURED_SHOWREEL_VIDEOS[activeShowreelIdx].watchUrl}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-white/15 bg-white/5 hover:border-[#e10600] text-xs font-medium text-neutral-200 hover:text-white transition-colors"
@@ -2176,9 +2241,9 @@ export default function ManishCinematicPage() {
                 </a>
                 <button
                   type="button"
-                  onClick={() => setShowreelOpen(false)}
+                  onClick={() => setActiveShowreelIdx(null)}
                   aria-label="Close showreel modal"
-                  className="p-2 rounded-lg bg-white/10 hover:bg-[#e10600] text-white transition-colors"
+                  className="p-2 rounded-lg bg-white/10 hover:bg-[#e10600] text-white transition-colors cursor-pointer"
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -2186,8 +2251,9 @@ export default function ManishCinematicPage() {
             </div>
             <div className="aspect-video w-full bg-black">
               <iframe
-                title="Manish Cinematic Official Cinema Showreel"
-                src={SHOWREEL_YOUTUBE_EMBED_URL}
+                key={FEATURED_SHOWREEL_VIDEOS[activeShowreelIdx].id}
+                title={FEATURED_SHOWREEL_VIDEOS[activeShowreelIdx].title}
+                src={FEATURED_SHOWREEL_VIDEOS[activeShowreelIdx].embedUrl}
                 className="w-full h-full border-0"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                 referrerPolicy="strict-origin-when-cross-origin"
